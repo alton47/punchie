@@ -6,32 +6,38 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Punch's Great Escape 🐒 - The Monkey Game</title>
+    <title>Punch's Great Escape 🐒</title>
     <meta
       name="description"
-      content="Punch the monkey just stole the red plushie from the gang. Run, jump, slide through 20 levels to safety! Free browser game."
+      content="Help Punch the monkey get his red plushie back from the bully gang! Run, jump, slide through 10 wild levels. Free browser game inspired by a viral trend."
     />
     <meta
       name="keywords"
-      content="punch monkey game, monkey run game, endless runner, free browser game, punch monkey"
+      content="punch monkey game, monkey runner game, punch plushie game, monkey escape game, free browser game, punch monkey trend"
     />
-    <meta property="og:title" content="Punch's Great Escape 🐒" />
+    <meta
+      property="og:title"
+      content="Punch's Great Escape 🐒 - Get the plushie back!"
+    />
     <meta
       property="og:description"
-      content="Help Punch escape the monkey gang and reach the plushie! Free browser game."
+      content="The bully monkeys YOINKED Punch's red plushie. Help him get it back through 10 wild levels!"
     />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐒</text></svg>"
+    />
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap");
 
       :root {
-        --orange: #ff6b35;
-        --orange-dark: #c23b0a;
-        --yellow: #ffd166;
-        --teal: #06d6a0;
+        --org: #ff6b35;
+        --org2: #c23b0a;
+        --yel: #ffd166;
+        --tea: #06d6a0;
         --red: #ff4d6d;
-        --purple-dark: #1a0a2e;
-        --purple-mid: #2d1b69;
+        --pur: #1a0a2e;
       }
 
       * {
@@ -40,22 +46,23 @@
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
       }
-
       html,
       body {
         width: 100%;
         height: 100%;
-        background: #0d0420;
+        background: #060210;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         font-family: "Boogaloo", cursive;
         overflow: hidden;
         touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
-      #game-outer {
+      /* ── LAYOUT ── */
+      #wrap {
         position: relative;
         width: 100vw;
         height: 100vh;
@@ -64,19 +71,21 @@
         align-items: center;
         justify-content: center;
       }
-
-      #game-container {
+      #gc {
         position: relative;
-        background: #1a0a2e;
-        border-radius: clamp(8px, 2vw, 20px);
         overflow: hidden;
+        background: #1a0a2e;
         box-shadow:
-          0 0 60px rgba(255, 107, 53, 0.3),
-          0 0 120px rgba(45, 27, 105, 0.5);
+          0 0 80px rgba(255, 107, 53, 0.35),
+          0 0 160px rgba(45, 27, 105, 0.5);
+      }
+      #canvas {
+        display: block;
+        touch-action: none;
       }
 
-      /* ===================== SCREENS ===================== */
-      .screen {
+      /* ── SCREENS ── */
+      .scr {
         position: absolute;
         inset: 0;
         display: none;
@@ -84,445 +93,145 @@
         align-items: center;
         justify-content: center;
         z-index: 50;
-        background: linear-gradient(
-          160deg,
-          #0d0420 0%,
-          #1a0a2e 50%,
-          #2d1b69 100%
-        );
       }
-      .screen.active {
+      .scr.on {
         display: flex;
       }
 
-      /* ---- TITLE SCREEN ---- */
-      #title-screen {
-        gap: 0;
-        padding: 20px;
-      }
-
-      .title-art {
-        position: relative;
-        margin-bottom: 6px;
-      }
-
-      .title-punch-art {
-        width: 140px;
-        height: 140px;
-      }
-
-      h1.game-title {
-        font-size: clamp(32px, 8vw, 68px);
-        color: var(--orange);
-        text-shadow:
-          3px 3px 0 var(--orange-dark),
-          0 0 40px rgba(255, 107, 53, 0.4);
-        line-height: 1;
-        text-align: center;
-        letter-spacing: 2px;
-      }
-
-      .subtitle {
-        font-size: clamp(12px, 3vw, 18px);
-        color: var(--yellow);
-        letter-spacing: 3px;
-        margin: 6px 0 14px;
-        text-align: center;
-      }
-
-      .story-box {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 107, 53, 0.2);
-        border-radius: 12px;
-        padding: 12px 18px;
-        max-width: 460px;
-        font-size: clamp(12px, 2.5vw, 15px);
-        font-family: "Nunito", sans-serif;
-        color: rgba(255, 255, 255, 0.8);
-        line-height: 1.6;
-        text-align: center;
-        margin-bottom: 16px;
-      }
-
-      .btn-primary {
-        background: var(--orange);
-        color: white;
-        border: none;
-        padding: clamp(10px, 2vw, 16px) clamp(28px, 6vw, 52px);
-        font-size: clamp(18px, 4vw, 28px);
-        font-family: "Boogaloo", cursive;
-        border-radius: 50px;
-        cursor: pointer;
-        box-shadow:
-          0 5px 0 var(--orange-dark),
-          0 0 30px rgba(255, 107, 53, 0.4);
-        transition:
-          transform 0.1s,
-          box-shadow 0.1s;
-        letter-spacing: 1px;
-        -webkit-tap-highlight-color: transparent;
-      }
-      .btn-primary:hover,
-      .btn-primary:active {
-        transform: translateY(2px);
-        box-shadow:
-          0 3px 0 var(--orange-dark),
-          0 0 20px rgba(255, 107, 53, 0.3);
-      }
-
-      .btn-secondary {
-        background: transparent;
-        color: rgba(255, 255, 255, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        padding: 8px 24px;
-        font-size: clamp(12px, 2.5vw, 16px);
-        font-family: "Boogaloo", cursive;
-        border-radius: 50px;
-        cursor: pointer;
-        margin-top: 8px;
-        transition: all 0.2s;
-      }
-      .btn-secondary:hover {
-        color: white;
-        border-color: rgba(255, 255, 255, 0.4);
-      }
-
-      /* ---- HOW TO PLAY ---- */
-      #howtoplay-screen {
-        padding: 20px;
-        gap: 10px;
-      }
-      #howtoplay-screen h2 {
-        font-size: clamp(24px, 6vw, 42px);
-        color: var(--yellow);
-        text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-      }
-      .controls-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        width: 100%;
-        max-width: 480px;
-      }
-      .control-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        padding: 10px 12px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .control-key {
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-size: clamp(11px, 2vw, 14px);
-        color: var(--yellow);
-        white-space: nowrap;
-        min-width: 60px;
-        text-align: center;
-      }
-      .control-desc {
-        font-size: clamp(11px, 2vw, 13px);
-        font-family: "Nunito", sans-serif;
-        color: rgba(255, 255, 255, 0.75);
-        line-height: 1.3;
-      }
-      .dangers-row {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 480px;
-      }
-      .danger-badge {
-        background: rgba(255, 77, 109, 0.15);
-        border: 1px solid rgba(255, 77, 109, 0.3);
-        border-radius: 8px;
-        padding: 5px 10px;
-        font-size: clamp(10px, 2vw, 13px);
-        font-family: "Nunito", sans-serif;
-        color: rgba(255, 200, 200, 0.9);
-      }
-      .goal-box {
-        background: rgba(6, 214, 160, 0.1);
-        border: 1px solid rgba(6, 214, 160, 0.3);
-        border-radius: 10px;
-        padding: 10px 16px;
-        font-size: clamp(11px, 2.2vw, 14px);
-        font-family: "Nunito", sans-serif;
-        color: rgba(200, 255, 240, 0.9);
-        text-align: center;
-        max-width: 460px;
-        line-height: 1.5;
-      }
-
-      /* ---- HUD ---- */
+      /* ── HUD ── */
       #hud {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         display: none;
-        justify-content: space-between;
         align-items: center;
-        padding: clamp(5px, 1.5vw, 10px) clamp(8px, 2vw, 16px);
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
-        z-index: 20;
         gap: 6px;
+        padding: 6px 12px;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
+        z-index: 20;
+        flex-wrap: nowrap;
       }
-      #hud.show {
+      #hud.on {
         display: flex;
       }
-
-      #hearts-display {
-        font-size: clamp(14px, 3vw, 20px);
-        letter-spacing: 2px;
+      #hud-hearts {
+        font-size: clamp(13px, 2.5vw, 18px);
+        white-space: nowrap;
       }
-      #score-display {
-        font-size: clamp(12px, 2.5vw, 18px);
-        color: var(--yellow);
+      #hud-level {
+        font-size: clamp(11px, 2vw, 15px);
+        color: var(--tea);
+        white-space: nowrap;
       }
-      #level-display {
-        font-size: clamp(12px, 2.5vw, 18px);
-        color: var(--teal);
-      }
-
-      #progress-wrap {
+      #hud-prog-wrap {
         flex: 1;
-        max-width: 150px;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.1);
+        height: 7px;
+        background: rgba(255, 255, 255, 0.12);
         border-radius: 4px;
         overflow: hidden;
+        min-width: 40px;
       }
-      #progress-bar {
+      #hud-prog {
         height: 100%;
-        background: linear-gradient(90deg, var(--teal), var(--yellow));
-        border-radius: 4px;
         width: 0%;
+        background: linear-gradient(90deg, var(--tea), var(--yel));
+        border-radius: 4px;
         transition: width 0.3s;
       }
-
-      #pause-btn {
+      #hud-score {
+        font-size: clamp(11px, 2vw, 15px);
+        color: var(--yel);
+        white-space: nowrap;
+      }
+      #hud-gems {
+        font-size: clamp(10px, 1.8vw, 13px);
+        color: #a78bfa;
+        white-space: nowrap;
+      }
+      #hud-immuno {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 213, 79, 0.9);
+        color: #1a0a2e;
+        padding: 1px 10px;
+        font-size: 12px;
+        border-radius: 0 0 8px 8px;
+        display: none;
+      }
+      #hud-pause {
         background: rgba(255, 255, 255, 0.1);
         border: none;
         color: white;
-        font-size: clamp(12px, 2.5vw, 18px);
+        font-size: clamp(12px, 2vw, 16px);
         cursor: pointer;
         border-radius: 6px;
-        padding: 4px 8px;
+        padding: 3px 8px;
         font-family: "Boogaloo", cursive;
+        flex-shrink: 0;
       }
 
-      /* ---- PAUSE SCREEN ---- */
-      #pause-screen {
-        background: rgba(10, 3, 22, 0.88);
-        backdrop-filter: blur(8px);
-      }
-      #pause-screen h2 {
-        font-size: clamp(32px, 8vw, 56px);
-        color: var(--yellow);
-        margin-bottom: 20px;
-      }
-      .countdown-display {
-        font-size: clamp(60px, 15vw, 100px);
-        color: var(--orange);
-        text-shadow: 0 0 40px rgba(255, 107, 53, 0.6);
-        display: none;
-        line-height: 1;
-      }
-
-      /* ---- GAME OVER SCREEN ---- */
-      #gameover-screen {
-        padding: 20px;
-        gap: 8px;
-      }
-      #gameover-screen h2 {
-        font-size: clamp(28px, 7vw, 50px);
-        line-height: 1.1;
-        text-align: center;
-      }
-      .fail-reason {
-        font-size: clamp(14px, 3vw, 20px);
-        color: rgba(255, 200, 100, 0.9);
-        text-align: center;
-        font-family: "Nunito", sans-serif;
-        max-width: 360px;
-      }
-      .stats-row {
-        display: flex;
-        gap: 16px;
-        margin: 8px 0;
-      }
-      .stat-box {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        padding: 10px 16px;
-        text-align: center;
-        min-width: 80px;
-      }
-      .stat-box .val {
-        font-size: clamp(20px, 5vw, 32px);
-        color: var(--yellow);
-      }
-      .stat-box .lbl {
-        font-size: clamp(10px, 2vw, 13px);
-        font-family: "Nunito", sans-serif;
-        color: rgba(255, 255, 255, 0.5);
-      }
-      .btn-row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-      .btn-teal {
-        background: var(--teal);
-        color: #0d1a14;
-        border: none;
-        padding: clamp(8px, 2vw, 12px) clamp(20px, 4vw, 32px);
-        font-size: clamp(14px, 3vw, 20px);
-        font-family: "Boogaloo", cursive;
-        border-radius: 50px;
-        cursor: pointer;
-        box-shadow: 0 4px 0 #028a66;
-      }
-      .btn-red {
-        background: var(--red);
-        color: white;
-        border: none;
-        padding: clamp(8px, 2vw, 12px) clamp(20px, 4vw, 32px);
-        font-size: clamp(14px, 3vw, 20px);
-        font-family: "Boogaloo", cursive;
-        border-radius: 50px;
-        cursor: pointer;
-        box-shadow: 0 4px 0 #a01030;
-      }
-      .continue-hearts {
-        font-size: clamp(11px, 2.2vw, 14px);
-        color: rgba(255, 255, 255, 0.5);
-        font-family: "Nunito", sans-serif;
-        text-align: center;
-      }
-
-      /* ---- WIN SCREEN ---- */
-      #win-screen {
-        padding: 20px;
-        gap: 10px;
-      }
-      #win-screen h2 {
-        font-size: clamp(26px, 7vw, 50px);
-        color: var(--teal);
-        text-shadow: 2px 2px 0 #028a66;
-        text-align: center;
-      }
-      .win-story {
-        font-size: clamp(12px, 2.5vw, 15px);
-        font-family: "Nunito", sans-serif;
-        color: rgba(255, 255, 255, 0.85);
-        text-align: center;
-        max-width: 420px;
-        line-height: 1.7;
-      }
-      #win-art-canvas {
-        border-radius: 12px;
-        background: #0d0420;
-        margin: 6px 0;
-      }
-
-      /* ---- SHARE BTN ---- */
-      .btn-share {
-        background: linear-gradient(135deg, #ff6b35, #ff4d6d);
-        color: white;
-        border: none;
-        padding: clamp(8px, 2vw, 12px) clamp(20px, 4vw, 32px);
-        font-size: clamp(14px, 3vw, 20px);
-        font-family: "Boogaloo", cursive;
-        border-radius: 50px;
-        cursor: pointer;
-        box-shadow: 0 4px 0 #a01030;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      /* ---- MOBILE CONTROLS ---- */
-      #mobile-controls {
+      /* ── TOP-RIGHT BUTTONS (coffee + mute) ── */
+      #top-btns {
         position: absolute;
-        bottom: clamp(40px, 8vw, 70px);
-        left: 0;
-        right: 0;
+        top: clamp(36px, 7vw, 55px);
+        right: 8px;
         display: none;
-        justify-content: space-between;
-        padding: 0 clamp(10px, 3vw, 24px);
-        z-index: 20;
-        pointer-events: none;
+        flex-direction: column;
+        gap: 6px;
+        z-index: 30;
+        align-items: flex-end;
       }
-      #mobile-controls.show {
+      #top-btns.on {
         display: flex;
       }
-
-      .mobile-btn {
-        width: clamp(56px, 13vw, 80px);
-        height: clamp(56px, 13vw, 80px);
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.12);
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: clamp(22px, 5vw, 34px);
-        pointer-events: all;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
-        backdrop-filter: blur(4px);
-        transition:
-          background 0.1s,
-          transform 0.1s;
-      }
-      .mobile-btn:active {
-        background: rgba(255, 255, 255, 0.25);
-        transform: scale(0.9);
-      }
-
-      /* ---- BUY ME A COFFEE ---- */
-      #coffee-btn {
-        position: absolute;
-        top: clamp(40px, 8vw, 60px);
-        right: clamp(8px, 2vw, 16px);
+      #coffee-link {
         background: rgba(255, 213, 79, 0.15);
         border: 1px solid rgba(255, 213, 79, 0.4);
-        color: var(--yellow);
+        color: var(--yel);
         text-decoration: none;
-        padding: clamp(4px, 1vw, 7px) clamp(8px, 2vw, 14px);
-        font-size: clamp(10px, 2vw, 13px);
+        padding: 4px 10px;
+        font-size: clamp(10px, 1.8vw, 12px);
         font-family: "Boogaloo", cursive;
         border-radius: 20px;
-        z-index: 30;
-        display: none;
-        transition: all 0.2s;
-      }
-      #coffee-btn.show {
         display: flex;
         align-items: center;
         gap: 5px;
+        white-space: nowrap;
+        transition: background 0.2s;
       }
-      #coffee-btn:hover {
-        background: rgba(255, 213, 79, 0.25);
+      #coffee-link:hover {
+        background: rgba(255, 213, 79, 0.28);
+      }
+      #mute-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        align-self: flex-end;
+        transition: background 0.2s;
+      }
+      #mute-btn:hover {
+        background: rgba(255, 255, 255, 0.22);
       }
 
-      /* ---- DEV MODE ---- */
+      /* dev badge */
       #dev-badge {
         position: absolute;
-        top: clamp(40px, 8vw, 60px);
-        left: clamp(8px, 2vw, 16px);
+        top: clamp(36px, 7vw, 55px);
+        left: 8px;
         background: rgba(255, 77, 109, 0.2);
-        border: 1px solid rgba(255, 77, 109, 0.4);
+        border: 1px solid rgba(255, 77, 109, 0.5);
         color: var(--red);
         padding: 3px 10px;
         font-size: 11px;
@@ -531,102 +240,106 @@
         z-index: 30;
         display: none;
       }
-      #dev-badge.show {
+      #dev-badge.on {
         display: block;
       }
 
-      /* ---- FOOTER ---- */
-      .made-with {
+      /* ── MOBILE CONTROLS ── */
+      #mob-ctrl {
         position: absolute;
-        bottom: clamp(4px, 1.5vw, 10px);
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: clamp(9px, 1.8vw, 12px);
-        color: rgba(255, 255, 255, 0.25);
-        font-family: "Nunito", sans-serif;
-        white-space: nowrap;
-        z-index: 5;
+        bottom: clamp(30px, 6vw, 50px);
+        left: 0;
+        right: 0;
+        display: none;
+        justify-content: space-between;
+        padding: 0 clamp(10px, 3vw, 24px);
+        z-index: 20;
+        pointer-events: none;
+      }
+      #mob-ctrl.on {
+        display: flex;
+      }
+      .mb {
+        width: clamp(58px, 13vw, 76px);
+        height: clamp(58px, 13vw, 76px);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(24px, 5vw, 32px);
+        pointer-events: all;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition:
+          background 0.1s,
+          transform 0.1s;
+        backdrop-filter: blur(4px);
+      }
+      .mb:active {
+        background: rgba(255, 255, 255, 0.28);
+        transform: scale(0.88);
+      }
+      #mb-mid {
+        display: flex;
+        gap: 10px;
       }
 
-      /* ---- TOAST / ANNOUNCEMENTS ---- */
-      #level-toast {
+      /* ── TOAST ── */
+      #toast {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.75);
-        border: 2px solid var(--yellow);
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid var(--yel);
         border-radius: 16px;
         padding: 14px 28px;
         text-align: center;
-        z-index: 40;
+        z-index: 55;
         pointer-events: none;
         display: none;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(10px);
       }
-      #level-toast .level-num {
-        font-size: clamp(40px, 10vw, 64px);
-        color: var(--yellow);
+      #toast-num {
+        font-size: clamp(42px, 10vw, 64px);
+        color: var(--yel);
         line-height: 1;
       }
-      #level-toast .level-label {
-        font-size: clamp(14px, 3vw, 20px);
-        color: rgba(255, 255, 255, 0.8);
+      #toast-sub {
+        font-size: clamp(13px, 2.5vw, 18px);
+        color: rgba(255, 255, 255, 0.85);
         font-family: "Nunito", sans-serif;
       }
-      #level-toast .level-bg-name {
-        font-size: clamp(12px, 2.5vw, 16px);
-        color: var(--teal);
+      #toast-bg {
+        font-size: clamp(11px, 2vw, 15px);
+        color: var(--tea);
+        margin-top: 2px;
       }
 
-      /* ---- CANVAS ---- */
-      #canvas {
-        display: block;
-        touch-action: none;
-      }
-
-      /* ---- SCORE POPUP ---- */
-      .score-pop {
-        position: absolute;
-        pointer-events: none;
-        font-family: "Boogaloo", cursive;
-        font-size: clamp(14px, 3vw, 20px);
-        z-index: 35;
-        animation: floatUp 0.8s ease-out forwards;
-      }
-      @keyframes floatUp {
-        0% {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-        100% {
-          opacity: 0;
-          transform: translateY(-50px) scale(1.3);
-        }
-      }
-
-      /* ---- RARE FIND BANNER ---- */
+      /* ── RARE BANNER ── */
       #rare-banner {
         position: absolute;
-        top: clamp(50px, 10vw, 80px);
+        top: clamp(45px, 9vw, 70px);
         left: 50%;
         transform: translateX(-50%);
-        background: linear-gradient(135deg, #ffd166, #ff9f1c);
+        background: linear-gradient(135deg, var(--yel), #ff9f1c);
         color: #1a0a2e;
-        padding: 8px 20px;
+        padding: 7px 20px;
         border-radius: 30px;
-        font-size: clamp(12px, 2.5vw, 16px);
+        font-size: clamp(12px, 2.3vw, 15px);
         font-family: "Nunito", sans-serif;
         font-weight: 700;
-        z-index: 40;
+        z-index: 45;
         pointer-events: none;
         display: none;
         white-space: nowrap;
         box-shadow: 0 4px 20px rgba(255, 209, 102, 0.5);
       }
-      #rare-banner.show {
+      #rare-banner.pop {
         display: block;
-        animation: rarePop 2.5s ease forwards;
+        animation: rarePop 2.6s ease forwards;
       }
       @keyframes rarePop {
         0% {
@@ -648,1271 +361,1899 @@
           transform: translateX(-50%) scale(0.8);
         }
       }
+
+      /* ── FOOTER ── */
+      .madeby {
+        position: absolute;
+        bottom: clamp(3px, 1vw, 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: clamp(9px, 1.6vw, 11px);
+        color: rgba(255, 255, 255, 0.22);
+        font-family: "Nunito", sans-serif;
+        white-space: nowrap;
+        z-index: 5;
+        pointer-events: all;
+      }
+      .madeby a {
+        color: rgba(255, 255, 255, 0.4);
+        text-decoration: none;
+      }
+      .madeby a:hover {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      /* ── TITLE SCREEN ── */
+      #scr-title {
+        padding: clamp(12px, 2vw, 20px);
+        gap: 4px;
+        background: transparent;
+      }
+      #title-canvas-wrap {
+        position: relative;
+        flex-shrink: 0;
+      }
+      .gtitle {
+        font-size: clamp(28px, 7vw, 62px);
+        color: var(--org);
+        text-shadow:
+          3px 3px 0 var(--org2),
+          0 0 40px rgba(255, 107, 53, 0.4);
+        line-height: 1;
+        text-align: center;
+        letter-spacing: 2px;
+        margin-top: 4px;
+      }
+      .gsubtitle {
+        font-size: clamp(10px, 2.2vw, 15px);
+        color: var(--yel);
+        letter-spacing: 3px;
+        text-align: center;
+        margin: 3px 0 10px;
+      }
+      .story-box {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 107, 53, 0.2);
+        border-radius: 12px;
+        padding: 10px 16px;
+        max-width: 440px;
+        font-size: clamp(11px, 2.2vw, 14px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 255, 255, 0.82);
+        line-height: 1.6;
+        text-align: center;
+        margin-bottom: 12px;
+        width: 100%;
+      }
+      .btn-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .btn-p {
+        background: var(--org);
+        color: white;
+        border: none;
+        padding: clamp(9px, 2vw, 14px) clamp(24px, 5vw, 44px);
+        font-size: clamp(16px, 3.5vw, 24px);
+        font-family: "Boogaloo", cursive;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow:
+          0 5px 0 var(--org2),
+          0 0 28px rgba(255, 107, 53, 0.4);
+        transition:
+          transform 0.1s,
+          box-shadow 0.1s;
+        letter-spacing: 1px;
+      }
+      .btn-p:active {
+        transform: translateY(2px);
+        box-shadow: 0 3px 0 var(--org2);
+      }
+      .btn-s {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 7px 20px;
+        font-size: clamp(11px, 2.2vw, 14px);
+        font-family: "Boogaloo", cursive;
+        border-radius: 50px;
+        cursor: pointer;
+        margin-top: 6px;
+        transition: all 0.2s;
+      }
+      .btn-s:hover {
+        color: white;
+        border-color: rgba(255, 255, 255, 0.45);
+      }
+      .btn-t {
+        background: var(--tea);
+        color: #0d1a14;
+        border: none;
+        padding: clamp(8px, 1.8vw, 12px) clamp(18px, 4vw, 30px);
+        font-size: clamp(13px, 2.8vw, 18px);
+        font-family: "Boogaloo", cursive;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #028a66;
+      }
+      .btn-r {
+        background: var(--red);
+        color: white;
+        border: none;
+        padding: clamp(8px, 1.8vw, 12px) clamp(18px, 4vw, 30px);
+        font-size: clamp(13px, 2.8vw, 18px);
+        font-family: "Boogaloo", cursive;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #a01030;
+      }
+      .btn-sh {
+        background: linear-gradient(135deg, var(--org), var(--red));
+        color: white;
+        border: none;
+        padding: clamp(8px, 1.8vw, 12px) clamp(18px, 4vw, 30px);
+        font-size: clamp(13px, 2.8vw, 18px);
+        font-family: "Boogaloo", cursive;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #a01030;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .best-row {
+        font-size: clamp(10px, 1.8vw, 13px);
+        color: rgba(255, 255, 255, 0.3);
+        font-family: "Nunito", sans-serif;
+        margin-top: 8px;
+        text-align: center;
+      }
+
+      /* ── HOW TO PLAY SCREEN ── */
+      #scr-how {
+        padding: clamp(10px, 2vw, 18px);
+        gap: 8px;
+        overflow-y: auto;
+        background: linear-gradient(160deg, #0d0420, #1a0a2e, #2d1b69);
+      }
+      #scr-how h2 {
+        font-size: clamp(22px, 5vw, 38px);
+        color: var(--yel);
+        margin-bottom: 4px;
+      }
+      .ctrl-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        width: 100%;
+        max-width: 480px;
+      }
+      .ctrl-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 8px 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .ctrl-key {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        padding: 3px 7px;
+        font-size: clamp(10px, 1.8vw, 13px);
+        color: var(--yel);
+        white-space: nowrap;
+        min-width: 55px;
+        text-align: center;
+        line-height: 1.4;
+      }
+      .ctrl-desc {
+        font-size: clamp(10px, 1.8vw, 12px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.3;
+      }
+      .gem-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        width: 100%;
+        max-width: 480px;
+      }
+      .gem-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 6px 8px;
+        text-align: center;
+      }
+      .gem-card .gem-ico {
+        font-size: clamp(14px, 3vw, 20px);
+      }
+      .gem-card .gem-nm {
+        font-size: clamp(9px, 1.6vw, 11px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 2px;
+        line-height: 1.2;
+      }
+      .villain-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: center;
+        max-width: 480px;
+      }
+      .vbadge {
+        background: rgba(255, 77, 109, 0.12);
+        border: 1px solid rgba(255, 77, 109, 0.3);
+        border-radius: 7px;
+        padding: 4px 9px;
+        font-size: clamp(9px, 1.7vw, 11px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 190, 190, 0.9);
+      }
+      .goal-box {
+        background: rgba(6, 214, 160, 0.08);
+        border: 1px solid rgba(6, 214, 160, 0.28);
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: clamp(10px, 1.9vw, 13px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(200, 255, 240, 0.9);
+        text-align: center;
+        max-width: 460px;
+        line-height: 1.5;
+        width: 100%;
+      }
+
+      /* ── ABOUT ── */
+      #scr-about {
+        padding: clamp(12px, 2.5vw, 22px);
+        gap: 8px;
+        overflow-y: auto;
+        background: linear-gradient(160deg, #0d0420, #1a0a2e, #2d1b69);
+        align-items: flex-start;
+      }
+      #scr-about h2 {
+        font-size: clamp(20px, 4.5vw, 34px);
+        color: var(--org);
+        align-self: center;
+      }
+      .about-section {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 12px;
+        padding: 10px 14px;
+        width: 100%;
+        max-width: 480px;
+        align-self: center;
+      }
+      .about-section h3 {
+        font-size: clamp(13px, 2.5vw, 17px);
+        color: var(--yel);
+        margin-bottom: 6px;
+      }
+      .about-section p {
+        font-size: clamp(10px, 1.9vw, 13px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.7;
+      }
+      .about-section a {
+        color: var(--tea);
+      }
+      .villain-about-list {
+        list-style: none;
+        margin-top: 6px;
+      }
+      .villain-about-list li {
+        font-size: clamp(10px, 1.8vw, 12px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 255, 255, 0.7);
+        padding: 3px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        line-height: 1.5;
+      }
+      .villain-about-list li strong {
+        color: rgba(255, 220, 150, 0.9);
+      }
+
+      /* ── PAUSE SCREEN ── */
+      #scr-pause {
+        background: rgba(8, 2, 18, 0.9);
+        backdrop-filter: blur(10px);
+      }
+      #scr-pause h2 {
+        font-size: clamp(30px, 7vw, 52px);
+        color: var(--yel);
+        margin-bottom: 16px;
+      }
+      #scr-pause p {
+        color: rgba(255, 255, 255, 0.5);
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(11px, 2vw, 14px);
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      #countdown {
+        font-size: clamp(64px, 16vw, 110px);
+        color: var(--org);
+        text-shadow: 0 0 40px rgba(255, 107, 53, 0.6);
+        display: none;
+        line-height: 1;
+      }
+
+      /* ── GAME OVER ── */
+      #scr-over {
+        padding: clamp(12px, 2.5vw, 20px);
+        gap: 7px;
+        background: linear-gradient(160deg, #0d0420, #1a0a2e, #2d1b69);
+      }
+      #scr-over h2 {
+        font-size: clamp(24px, 6vw, 46px);
+        line-height: 1.1;
+        text-align: center;
+      }
+      .fail-reason {
+        font-size: clamp(12px, 2.5vw, 17px);
+        color: rgba(255, 200, 100, 0.9);
+        text-align: center;
+        font-family: "Nunito", sans-serif;
+        max-width: 360px;
+      }
+      .stats-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .s-box {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        min-width: 70px;
+      }
+      .s-box .val {
+        font-size: clamp(18px, 4.5vw, 30px);
+        color: var(--yel);
+      }
+      .s-box .lbl {
+        font-size: clamp(9px, 1.7vw, 12px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .gems-collected {
+        font-size: clamp(11px, 2vw, 14px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(200, 180, 255, 0.8);
+        text-align: center;
+      }
+
+      /* ── WIN SCREEN ── */
+      #scr-win {
+        padding: clamp(12px, 2.5vw, 20px);
+        gap: 8px;
+        background: linear-gradient(160deg, #0d0420, #1a0a2e, #2d1b69);
+      }
+      #scr-win h2 {
+        font-size: clamp(22px, 5.5vw, 44px);
+        color: var(--tea);
+        text-shadow: 2px 2px 0 #028a66;
+        text-align: center;
+      }
+      #win-canvas {
+        border-radius: 12px;
+        background: #050218;
+      }
+      .win-story {
+        font-size: clamp(11px, 2.2vw, 14px);
+        font-family: "Nunito", sans-serif;
+        color: rgba(255, 255, 255, 0.85);
+        text-align: center;
+        max-width: 400px;
+        line-height: 1.7;
+      }
+
+      /* ── SCORE POPUP ── */
+      .spop {
+        position: absolute;
+        pointer-events: none;
+        font-family: "Boogaloo", cursive;
+        font-size: clamp(13px, 2.5vw, 18px);
+        z-index: 45;
+        animation: floatUp 0.9s ease-out forwards;
+      }
+      @keyframes floatUp {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-55px) scale(1.3);
+        }
+      }
     </style>
   </head>
   <body>
-    <div id="game-outer">
-      <div id="game-container">
+    <div id="wrap">
+      <div id="gc">
         <!-- CANVAS -->
         <canvas id="canvas"></canvas>
 
         <!-- HUD -->
         <div id="hud">
-          <div id="hearts-display">❤️❤️❤️</div>
-          <div id="level-display">LVL 1</div>
-          <div id="progress-wrap"><div id="progress-bar"></div></div>
-          <div id="score-display">0</div>
-          <button id="pause-btn" onclick="togglePause()">⏸</button>
+          <div id="hud-hearts">❤️❤️❤️</div>
+          <div id="hud-level">LVL 1</div>
+          <div id="hud-prog-wrap"><div id="hud-prog"></div></div>
+          <div id="hud-gems">💎0</div>
+          <div id="hud-score">0</div>
+          <button id="hud-pause" onclick="togglePause()">⏸</button>
+          <div id="hud-immuno">🛡️ IMMUNE</div>
         </div>
 
-        <!-- COFFEE BTN -->
-        <a
-          id="coffee-btn"
-          href="https://buymeacoffee.com/allanito"
-          target="_blank"
-          onclick="pauseForCoffee()"
-        >
-          ☕ Buy me a coffee
-        </a>
+        <!-- TOP BUTTONS -->
+        <div id="top-btns">
+          <a
+            id="coffee-link"
+            href="https://buymeacoffee.com/allanito"
+            target="_blank"
+            onclick="pauseOnCoffee()"
+            >☕ Buy me a coffee</a
+          >
+          <button id="mute-btn" onclick="toggleMute()">🔊</button>
+        </div>
 
         <!-- DEV BADGE -->
         <div id="dev-badge">🔧 DEV MODE</div>
 
         <!-- TITLE SCREEN -->
-        <div id="title-screen" class="screen active">
-          <div class="title-art">
-            <canvas id="title-art-canvas" class="title-punch-art"></canvas>
+        <div id="scr-title" class="scr on">
+          <div id="title-canvas-wrap">
+            <canvas id="title-canvas" width="160" height="160"></canvas>
           </div>
-          <h1 class="game-title">PUNCH'S<br />GREAT ESCAPE</h1>
-          <p class="subtitle">🧸 THE RED PLUSHIE AWAITS 🧸</p>
+          <h1 class="gtitle">PUNCH'S<br />GREAT ESCAPE</h1>
+          <p class="gsubtitle">🧸 THE PLUSHIE MUST BE RECLAIMED 🧸</p>
           <div class="story-box">
-            Punch just <strong>YOINKED</strong> the red plushie from the monkey
-            gang.<br />
-            Now they want it back. 20 levels stand between Punch and peace.<br />
-            <em>Run. Jump. Slide. Survive.</em>
+            The bully monkeys <strong>YOINKED</strong> Punch's beloved red
+            plushie.<br />
+            Now he has to fight through 10 wild levels of chaos<br />to get it
+            back. <em>Jump. Slide. Survive. Reclaim.</em>
           </div>
           <div class="btn-row">
-            <button class="btn-primary" onclick="goToHowToPlay()">
-              Start Game!! 🐒
-            </button>
+            <button class="btn-p" onclick="goHow()">Start Game!! 🐒</button>
+            <button class="btn-s" onclick="goAbout()">📖 About</button>
           </div>
-          <button class="btn-secondary" onclick="startGameDirect()">
-            Skip intro →
-          </button>
-          <p
-            style="
-              font-size: clamp(11px, 2vw, 13px);
-              color: rgba(255, 255, 255, 0.3);
-              font-family: Nunito, sans-serif;
-              margin-top: 10px;
-            "
-          >
-            🏆 Best: <span id="best-score-title">-</span> &nbsp;|&nbsp; Max
-            Level: <span id="best-level-title">-</span>
-          </p>
+          <button class="btn-s" onclick="startGame()">Skip intro →</button>
+          <div class="best-row">
+            🏆 Best: <span id="best-sc">—</span> &nbsp;|&nbsp; Max LVL:
+            <span id="best-lv">—</span>
+          </div>
         </div>
 
-        <!-- HOW TO PLAY SCREEN -->
-        <div id="howtoplay-screen" class="screen">
+        <!-- HOW TO PLAY -->
+        <div id="scr-how" class="scr">
           <h2>🎮 How to Play</h2>
-          <div class="controls-grid">
-            <div class="control-card">
-              <div class="control-key">SPACE / ↑<br />W / Tap↑</div>
-              <div class="control-desc">
-                Jump<br /><em style="color: var(--teal); font-size: 11px"
-                  >Double jump!</em
-                >
-              </div>
-            </div>
-            <div class="control-card">
-              <div class="control-key">↓ / S<br />Tap↓</div>
-              <div class="control-desc">
-                Slide / Duck<br /><em
-                  style="color: rgba(255, 255, 255, 0.5); font-size: 11px"
-                  >under vines</em
-                >
-              </div>
-            </div>
-            <div class="control-card">
-              <div class="control-key">P / ESC</div>
-              <div class="control-desc">Pause game<br />3-2-1 resume</div>
-            </div>
-            <div class="control-card">
-              <div class="control-key">L key</div>
-              <div class="control-desc">🔧 Dev mode<br />slow + revive</div>
-            </div>
+          <div class="ctrl-grid" id="ctrl-grid">
+            <!-- filled by JS based on device -->
           </div>
-          <div class="dangers-row">
-            <div class="danger-badge">🐒 Slider — <strong>JUMP</strong></div>
-            <div class="danger-badge">🦍 Jumper — <strong>JUMP</strong></div>
-            <div class="danger-badge">🌿 Vine — <strong>SLIDE</strong></div>
-            <div class="danger-badge">🪨 Stone — <strong>JUMP</strong></div>
-            <div class="danger-badge">
-              🍌 Banana peel — <strong>JUMP</strong>
-            </div>
-          </div>
-          <div class="goal-box">
-            🎯 <strong>Goal:</strong> Survive all 20 levels and reach the
-            <strong>Red Plushie</strong>!<br />
-            Collect 🍌 bananas for points. Find rare items for bonuses!<br />
-            Each level gets faster. Watch your ❤️ hearts.
-          </div>
-          <button
-            class="btn-primary"
-            onclick="startGameDirect()"
-            style="margin-top: 6px"
-          >
-            Let's GO! 🚀
-          </button>
-        </div>
-
-        <!-- PAUSE SCREEN -->
-        <div id="pause-screen" class="screen">
-          <h2>⏸ PAUSED</h2>
-          <p
+          <div
             style="
-              color: rgba(255, 255, 255, 0.5);
-              font-family: Nunito, sans-serif;
-              font-size: clamp(13px, 2.5vw, 16px);
-              margin-bottom: 24px;
+              font-size: clamp(11px, 2vw, 14px);
+              color: var(--yel);
+              margin-top: 2px;
+              text-align: center;
             "
           >
-            Press P / ESC or tap to resume
-          </p>
-          <div class="countdown-display" id="countdown-display">3</div>
-          <button class="btn-primary" onclick="resumeGame()">Resume ▶</button>
+            ⚠️ Dangers — Jump or Slide to avoid!
+          </div>
+          <div class="villain-list" id="villain-list-how"></div>
+          <div
+            style="
+              font-size: clamp(11px, 2vw, 14px);
+              color: #a78bfa;
+              text-align: center;
+            "
+          >
+            ✨ Hidden Gems to Collect
+          </div>
+          <div class="gem-grid" id="gem-grid-how"></div>
+          <div class="goal-box">
+            🎯 <strong>Goal:</strong> Survive all 10 levels and reclaim the
+            <strong>Red Plushie</strong>!<br />Each level you need to beat MORE
+            obstacles. Collect gems for powers!
+          </div>
+          <div class="btn-row">
+            <button class="btn-p" onclick="startGame()">LET'S GO!! 🚀</button>
+          </div>
         </div>
 
-        <!-- GAME OVER SCREEN -->
-        <div id="gameover-screen" class="screen">
-          <h2 id="fail-title" style="color: var(--red)">💀 GOT CAUGHT</h2>
-          <p class="fail-reason" id="fail-reason">
-            The monkey gang caught up...
-          </p>
+        <!-- ABOUT -->
+        <div id="scr-about" class="scr">
+          <h2>📖 About</h2>
+          <div class="about-section">
+            <h3>🐒 The Story</h3>
+            <p>
+              Inspired by the viral <strong>Punch monkey trend</strong> that
+              took over the internet — a lil monkey and his beloved red plushie.
+              The bullies took it. He wants it back. Simple. Emotional.
+              Legendary.
+            </p>
+          </div>
+          <div class="about-section">
+            <h3>👨‍💻 The Creator</h3>
+            <p>
+              <strong>Allan</strong> saw the Punch trend on Instagram in early
+              2026 and decided to jump in and spread some love. Built this in a
+              day.
+              <a href="https://github.com/alton47" target="_blank"
+                >@alton47 on GitHub</a
+              >
+              •
+              <a href="https://buymeacoffee.com/allanito" target="_blank"
+                >Buy him a coffee ☕</a
+              >
+            </p>
+          </div>
+          <div class="about-section">
+            <h3>👿 The Villain Gang</h3>
+            <ul class="villain-about-list" id="villain-about-list"></ul>
+          </div>
+          <div class="about-section">
+            <h3>✨ Gem Powers</h3>
+            <ul class="villain-about-list" id="gem-about-list"></ul>
+          </div>
+          <div class="about-section">
+            <h3>🎮 Goal</h3>
+            <p>
+              Get through all <strong>10 levels</strong>. Each level adds more
+              obstacles. Collect gems for special powers — especially the
+              <strong>🔮 Immunity Orb</strong> (rarest!). Reach level 10 and
+              watch Punch finally sleep peacefully with his plushie. 💛
+            </p>
+          </div>
+          <div
+            class="btn-row"
+            style="
+              justify-content: center;
+              width: 100%;
+              max-width: 480px;
+              align-self: center;
+            "
+          >
+            <button class="btn-p" onclick="startGame()">Play Now 🐒</button>
+            <button class="btn-s" onclick="showScr('scr-title')">← Back</button>
+          </div>
+        </div>
+
+        <!-- PAUSE -->
+        <div id="scr-pause" class="scr">
+          <h2>⏸ PAUSED</h2>
+          <p id="pause-hint">Press P / ESC or tap Resume to continue</p>
+          <div id="countdown"></div>
+          <div class="btn-row">
+            <button class="btn-p" onclick="resumeGame()">▶ Resume</button>
+            <button class="btn-s" onclick="goTitle()">Main Menu</button>
+          </div>
+        </div>
+
+        <!-- GAME OVER -->
+        <div id="scr-over" class="scr">
+          <h2 id="fail-title">💀 GOT CAUGHT</h2>
+          <p class="fail-reason" id="fail-msg">The gang caught up...</p>
           <div class="stats-row">
-            <div class="stat-box">
-              <div class="val" id="go-score">0</div>
+            <div class="s-box">
+              <div class="val" id="go-sc">0</div>
               <div class="lbl">Score</div>
             </div>
-            <div class="stat-box">
-              <div class="val" id="go-level">1</div>
+            <div class="s-box">
+              <div class="val" id="go-lv">1</div>
               <div class="lbl">Level</div>
             </div>
-            <div class="stat-box">
+            <div class="s-box">
               <div class="val" id="go-best">0</div>
               <div class="lbl">Best</div>
             </div>
-            <div class="stat-box">
-              <div class="val" id="go-maxlevel">1</div>
-              <div class="lbl">Max Lvl</div>
+            <div class="s-box">
+              <div class="val" id="go-maxlv">1</div>
+              <div class="lbl">Max LVL</div>
             </div>
           </div>
-          <div class="continue-hearts" id="continue-info">
-            You have hearts left! Continue from here?
-          </div>
-          <div class="btn-row" style="margin-top: 8px">
-            <button class="btn-teal" id="continue-btn" onclick="continueGame()">
+          <div class="gems-collected" id="go-gems">Gems: 0 / 0</div>
+          <div
+            id="continue-info"
+            style="
+              font-size: clamp(10px, 1.9vw, 13px);
+              color: rgba(255, 255, 255, 0.5);
+              font-family: &quot;Nunito&quot;, sans-serif;
+              text-align: center;
+            "
+          ></div>
+          <div class="btn-row" style="margin-top: 4px">
+            <button class="btn-t" id="cont-btn" onclick="continueRun()">
               Continue ❤️
             </button>
-            <button class="btn-red" onclick="restartGame()">Restart 🔄</button>
-            <button class="btn-share" onclick="shareScore()">📤 Share</button>
+            <button class="btn-r" onclick="restartGame()">Restart 🔄</button>
+            <button class="btn-sh" onclick="doShare('over')">📤 Share</button>
           </div>
-          <button class="btn-secondary" onclick="goToTitle()">Main Menu</button>
+          <button class="btn-s" onclick="goTitle()">Main Menu</button>
         </div>
 
-        <!-- WIN SCREEN -->
-        <div id="win-screen" class="screen">
-          <h2>🧸 THE PLUSHIE IS YOURS!</h2>
-          <canvas id="win-art-canvas" width="280" height="140"></canvas>
+        <!-- WIN -->
+        <div id="scr-win" class="scr">
+          <h2>🧸 PLUSHIE RECLAIMED!</h2>
+          <canvas id="win-canvas" width="300" height="160"></canvas>
           <p class="win-story">
-            Punch ran through jungle, moon paths and monkey madness...<br />
-            and he made it. He curled up with the red plushie,<br />
-            <strong>finally at peace. 💛</strong>
+            Punch ran through jungle, ruins, storms and chaos...<br />and he
+            made it. He curled up with the red plushie,<br /><strong
+              >finally at peace. 💛</strong
+            >
           </p>
           <div class="stats-row" style="justify-content: center">
-            <div class="stat-box">
-              <div class="val" id="win-score">0</div>
+            <div class="s-box">
+              <div class="val" id="win-sc">0</div>
               <div class="lbl">Score</div>
             </div>
-            <div class="stat-box">
+            <div class="s-box">
               <div class="val" id="win-time">0s</div>
               <div class="lbl">Time</div>
             </div>
+            <div class="s-box">
+              <div class="val" id="win-gems">0</div>
+              <div class="lbl">Gems</div>
+            </div>
           </div>
           <div class="btn-row">
-            <button class="btn-share" onclick="shareWin()">
+            <button class="btn-sh" onclick="doShare('win')">
               📤 Share Victory!
             </button>
-            <button class="btn-primary" onclick="restartGame()">
-              Play Again 🐒
-            </button>
+            <button class="btn-p" onclick="restartGame()">Play Again 🐒</button>
           </div>
         </div>
 
         <!-- LEVEL TOAST -->
-        <div id="level-toast">
-          <div class="level-num" id="toast-num">1</div>
-          <div class="level-label" id="toast-label">LEVEL START</div>
-          <div class="level-bg-name" id="toast-bg">🌴 Monkey Zoo</div>
+        <div id="toast">
+          <div id="toast-num">1</div>
+          <div id="toast-sub">LEVEL START</div>
+          <div id="toast-bg">🌴 Monkey Zoo</div>
         </div>
 
-        <!-- RARE FIND -->
-        <div id="rare-banner" id="rare-banner"></div>
+        <!-- RARE BANNER -->
+        <div id="rare-banner"></div>
 
         <!-- MOBILE CONTROLS -->
-        <div id="mobile-controls">
+        <div id="mob-ctrl">
           <div
-            class="mobile-btn"
-            id="btn-slide"
-            ontouchstart="mobileSlideStart()"
-            ontouchend="mobileSlideEnd()"
+            class="mb"
+            id="mb-slide"
+            ontouchstart="mSlide(1)"
+            ontouchend="mSlide(0)"
           >
-            ⬇️
+            ↓
           </div>
-          <div class="mobile-btn" id="btn-jump" ontouchstart="mobileJump()">
-            ⬆️
+          <div id="mb-mid">
+            <div class="mb" id="mb-jump" ontouchstart="mJump()">↑</div>
           </div>
         </div>
 
-        <!-- MADE WITH -->
-        <div class="made-with">made with ❤️ Allan</div>
+        <!-- FOOTER -->
+        <div class="madeby">
+          made with ❤️
+          <a href="https://github.com/alton47" target="_blank">Allan</a>
+        </div>
       </div>
     </div>
 
     <script>
-      // ========================================================
-      // PUNCH'S GREAT ESCAPE — Full Game Engine
-      // ========================================================
+      "use strict";
+      // ═══════════════════════════════════════════════════════
+      //  PUNCH'S GREAT ESCAPE — V3 Complete Engine
+      // ═══════════════════════════════════════════════════════
 
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-      let W, H, GROUND, GC_RATIO;
+      // ── CANVAS / SIZING ──
+      const cv = document.getElementById("canvas");
+      const cx = cv.getContext("2d");
+      let W = 800,
+        H = 300,
+        GR = 240,
+        GR2 = 0.82; // GR=ground Y, GR2=ratio
+      const GC = document.getElementById("gc");
 
-      // ---- RESPONSIVE SIZING ----
       function resize() {
         const vw = window.innerWidth,
           vh = window.innerHeight;
-        const aspect = 8 / 3.2;
+        // Landscape aspect 8:3.4
         let cw, ch;
+        const aspect = 8 / 3.4;
         if (vw / vh > aspect) {
-          ch = Math.min(vh, 500);
+          ch = Math.min(vh * 0.97, 520);
           cw = Math.round(ch * aspect);
         } else {
-          cw = Math.min(vw, 900);
+          cw = Math.min(vw * 0.97, 880);
           ch = Math.round(cw / aspect);
         }
-        cw = Math.max(cw, 320);
+        cw = Math.max(cw, 300);
         ch = Math.max(ch, 128);
-
-        canvas.width = cw;
-        canvas.height = ch;
-        canvas.style.width = cw + "px";
-        canvas.style.height = ch + "px";
-
-        const gc = document.getElementById("game-container");
-        gc.style.width = cw + "px";
-        gc.style.height = ch + Math.round(ch * 0.13) + "px";
-
+        cv.width = cw;
+        cv.height = ch;
         W = cw;
         H = ch;
-        GROUND = H - Math.round(H * 0.2);
-        GC_RATIO = W / 800;
-
-        if (state === "idle") drawTitleBg();
+        GR = Math.round(H * 0.82);
+        GC.style.width = cw + "px";
+        GC.style.height = ch + Math.round(ch * 0.14) + "px";
+        S = cw / 800; // global scale ratio
+        if (gameState === "idle") drawTitleScene();
         drawTitleArt();
       }
       window.addEventListener("resize", resize);
+      let S = 1; // scale
 
-      // ---- AUDIO ENGINE (Web Audio API - 100% custom, no copyright) ----
-      let audioCtx;
-      function getAudio() {
-        if (!audioCtx)
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        return audioCtx;
+      // ── AUDIO (100% Web Audio API, no samples, no copyright) ──
+      let AC,
+        muted = false;
+      function getAC() {
+        if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+        return AC;
       }
 
-      function playTone(freq, type, dur, vol = 0.3, startTime = 0) {
+      function tone(freq, type, dur, vol = 0.25, delay = 0) {
+        if (muted) return;
         try {
-          const ac = getAudio();
-          const o = ac.createOscillator();
-          const g = ac.createGain();
+          const a = getAC(),
+            o = a.createOscillator(),
+            g = a.createGain();
           o.connect(g);
-          g.connect(ac.destination);
+          g.connect(a.destination);
           o.type = type;
-          o.frequency.setValueAtTime(freq, ac.currentTime + startTime);
-          g.gain.setValueAtTime(0, ac.currentTime + startTime);
-          g.gain.linearRampToValueAtTime(
-            vol,
-            ac.currentTime + startTime + 0.01,
-          );
+          o.frequency.setValueAtTime(freq, a.currentTime + delay);
+          g.gain.setValueAtTime(0, a.currentTime + delay);
+          g.gain.linearRampToValueAtTime(vol, a.currentTime + delay + 0.015);
           g.gain.exponentialRampToValueAtTime(
             0.001,
-            ac.currentTime + startTime + dur,
+            a.currentTime + delay + dur,
           );
-          o.start(ac.currentTime + startTime);
-          o.stop(ac.currentTime + startTime + dur + 0.05);
+          o.start(a.currentTime + delay);
+          o.stop(a.currentTime + delay + dur + 0.06);
         } catch (e) {}
       }
-
-      // Japanese flute-style with pentatonic scale
+      function noise(dur, vol = 0.15) {
+        if (muted) return;
+        try {
+          const a = getAC(),
+            buf = a.createBuffer(1, a.sampleRate * dur, a.sampleRate);
+          const d = buf.getChannelData(0);
+          for (let i = 0; i < d.length; i++)
+            d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) * vol * 1.5;
+          const s = a.createBufferSource(),
+            g = a.createGain();
+          s.buffer = buf;
+          s.connect(g);
+          g.connect(a.destination);
+          g.gain.setValueAtTime(vol, a.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + dur);
+          s.start();
+        } catch (e) {}
+      }
+      // Pentatonic: D E G A B (D pentatonic)
       const PENTA = [
-        261.63, 293.66, 329.63, 392, 440, 523.25, 587.33, 659.25, 784,
+        293.66, 329.63, 392, 440, 493.88, 587.33, 659.25, 783.99, 880,
       ];
-      let bgMusicInterval = null;
-      let musicOn = true;
-      let musicPhase = 0;
+      const WIND_SCALE = [220, 246.94, 293.66, 329.63, 370, 440]; // E minor
 
-      const MELODY_PHRASES = [
-        [4, 6, 7, 6, 4, 2, 0, 2, 4],
-        [0, 2, 4, 6, 7, 6, 4, 2, 0],
-        [2, 4, 6, 7, 8, 7, 6, 4, 2],
-        [7, 6, 4, 2, 0, 2, 4, 6, 7],
+      let bgTimer = null,
+        bgPhase = 0;
+      const PHRASES = [
+        [4, 6, 7, 6, 4, 2, 0, 2, 4, 2],
+        [0, 2, 4, 2, 0, 4, 6, 7, 6, 4],
+        [2, 4, 6, 7, 8, 7, 6, 4, 2, 0],
+        [7, 6, 4, 2, 0, 2, 0, 4, 6, 7],
+        [0, 4, 6, 4, 2, 4, 6, 7, 6, 4],
+        [6, 7, 8, 7, 6, 4, 2, 4, 6, 7],
       ];
 
-      function playBgMusic() {
-        if (!musicOn) return;
-        stopBgMusic();
+      function startMusic(context = "game") {
+        stopMusic();
+        if (muted) return;
+        // Different tempos for contexts
+        const tempo =
+          context === "title" ? 0.44 : context === "end" ? 0.52 : 0.36;
+        const phrase = PHRASES[bgPhase % PHRASES.length];
+        bgPhase++;
         let step = 0;
-        let phrase = MELODY_PHRASES[musicPhase % MELODY_PHRASES.length];
-        musicPhase++;
-
-        const interval = 0.38;
         function nextNote() {
-          if (!musicOn || state === "idle") return;
+          if (muted) return;
           const idx = phrase[step % phrase.length];
           const freq = PENTA[idx];
-          // Main flute note
-          playTone(freq, "sine", interval * 0.8, 0.12);
-          // Harmonics for flute timbre
-          playTone(freq * 2, "sine", interval * 0.5, 0.04);
-          // Soft pad underneath
-          if (step % 3 === 0)
-            playTone(freq * 0.5, "triangle", interval * 1.5, 0.06);
+          // Flute-like: main sine + harmonics
+          tone(freq, "sine", tempo * 0.75, 0.13);
+          tone(freq * 2, "sine", tempo * 0.4, 0.04);
+          tone(freq * 3, "sine", tempo * 0.25, 0.02);
+          if (step % 4 === 0) tone(freq * 0.5, "triangle", tempo * 2, 0.07); // bass pad
+          // Wind ambience occasionally
+          if (step % 7 === 0)
+            tone(
+              WIND_SCALE[Math.floor(Math.random() * WIND_SCALE.length)],
+              "sine",
+              tempo * 1.5,
+              0.03,
+            );
           step++;
-          if (step < phrase.length * 2) {
-            bgMusicInterval = setTimeout(nextNote, interval * 1000);
-          } else {
-            bgMusicInterval = setTimeout(playBgMusic, 300);
-          }
+          if (step < phrase.length * 2)
+            bgTimer = setTimeout(nextNote, tempo * 1000);
+          else bgTimer = setTimeout(() => startMusic(context), 500);
         }
         nextNote();
       }
-
-      function stopBgMusic() {
-        if (bgMusicInterval) {
-          clearTimeout(bgMusicInterval);
-          bgMusicInterval = null;
+      function stopMusic() {
+        if (bgTimer) {
+          clearTimeout(bgTimer);
+          bgTimer = null;
         }
       }
-
-      function sfxJump() {
-        playTone(440, "sine", 0.12, 0.15);
-        playTone(600, "sine", 0.08, 0.1, 0.06);
-      }
-      function sfxDoubleJump() {
-        playTone(660, "triangle", 0.1, 0.15);
-        playTone(880, "sine", 0.1, 0.12, 0.05);
-      }
-      function sfxSlide() {
-        try {
-          const ac = getAudio();
-          const buf = ac.createBuffer(1, ac.sampleRate * 0.1, ac.sampleRate);
-          const data = buf.getChannelData(0);
-          for (let i = 0; i < data.length; i++)
-            data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) * 0.2;
-          const src = ac.createBufferSource();
-          const g = ac.createGain();
-          src.buffer = buf;
-          src.connect(g);
-          g.connect(ac.destination);
-          g.gain.setValueAtTime(0.3, ac.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.12);
-          src.start();
-        } catch (e) {}
-      }
-      function sfxHit() {
-        playTone(150, "square", 0.2, 0.2);
-        playTone(100, "sawtooth", 0.15, 0.15, 0.05);
-        // Monkey cry
-        setTimeout(() => playTone(300, "sine", 0.3, 0.1), 80);
-      }
-      function sfxMiss() {
-        // enemy misses - whoosh
-        try {
-          const ac = getAudio();
-          const o = ac.createOscillator();
-          const g = ac.createGain();
-          o.connect(g);
-          g.connect(ac.destination);
-          o.type = "sawtooth";
-          o.frequency.setValueAtTime(600, ac.currentTime);
-          o.frequency.exponentialRampToValueAtTime(100, ac.currentTime + 0.15);
-          g.gain.setValueAtTime(0.08, ac.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
-          o.start();
-          o.stop(ac.currentTime + 0.2);
-        } catch (e) {}
-      }
-      function sfxBanana() {
-        playTone(880, "sine", 0.06, 0.15);
-        playTone(1100, "sine", 0.08, 0.12, 0.04);
-      }
-      function sfxLevelUp() {
-        const notes = [392, 523, 659, 784];
-        notes.forEach((f, i) => playTone(f, "sine", 0.2, 0.18, i * 0.1));
-      }
-      function sfxRare() {
-        const n = [784, 1047, 1319, 1568];
-        n.forEach((f, i) => playTone(f, "triangle", 0.25, 0.14, i * 0.08));
-      }
-      function sfxDeath() {
-        playTone(300, "square", 0.1, 0.2);
-        playTone(200, "square", 0.15, 0.2, 0.1);
-        playTone(100, "sawtooth", 0.3, 0.25, 0.2);
-      }
-      function sfxWin() {
-        const n = [523, 659, 784, 1047, 784, 1047, 1319];
-        n.forEach((f, i) => playTone(f, "sine", 0.3, 0.2, i * 0.15));
-      }
-      function sfxCountdown() {
-        playTone(440, "triangle", 0.2, 0.2);
-      }
-      function sfxGo() {
-        playTone(660, "sine", 0.15, 0.3);
-        playTone(880, "sine", 0.2, 0.25, 0.1);
-      }
-      function sfxMonkeyCry() {
-        playTone(350, "sine", 0.08, 0.1);
-        setTimeout(() => playTone(280, "sine", 0.12, 0.08), 60);
-        setTimeout(() => playTone(200, "sine", 0.15, 0.06), 130);
+      function toggleMute() {
+        muted = !muted;
+        document.getElementById("mute-btn").textContent = muted ? "🔇" : "🔊";
+        if (!muted && (gameState === "playing" || gameState === "title_anim"))
+          startMusic(gameState === "title_anim" ? "title" : "game");
+        else if (muted) stopMusic();
       }
 
-      // ---- LEVEL CONFIGS ----
+      // SFX
+      const sfx = {
+        jump: () => {
+          tone(440, "sine", 0.12, 0.18);
+          tone(600, "sine", 0.08, 0.1, 0.07);
+        },
+        djump: () => {
+          tone(660, "triangle", 0.1, 0.18);
+          tone(880, "sine", 0.1, 0.14, 0.06);
+        },
+        slide: () => {
+          noise(0.1, 0.18);
+          tone(220, "sine", 0.08, 0.08);
+        },
+        hit: () => {
+          tone(180, "square", 0.18, 0.22);
+          tone(120, "sawtooth", 0.14, 0.18, 0.06);
+          setTimeout(() => sfx.mkcry(), 150);
+        },
+        mkcry: () => {
+          tone(340, "sine", 0.07, 0.12);
+          tone(260, "sine", 0.1, 0.1, 0.07);
+          tone(190, "sine", 0.14, 0.08, 0.14);
+        },
+        mkpass: () => {
+          tone(500, "sawtooth", 0.06, 0.08);
+          tone(320, "sine", 0.08, 0.06, 0.05);
+        }, // whoosh past
+        banana: () => {
+          tone(880, "sine", 0.06, 0.18);
+          tone(1100, "sine", 0.08, 0.14, 0.05);
+        },
+        rare: () => {
+          [784, 1047, 1319, 1568].forEach((f, i) =>
+            tone(f, "triangle", 0.28, 0.16, i * 0.09),
+          );
+        },
+        immuno: () => {
+          [523, 659, 784, 1047, 1319].forEach((f, i) =>
+            tone(f, "sine", 0.22, 0.18, i * 0.07),
+          );
+          sfx.rare();
+        },
+        lvlup: () => {
+          [392, 523, 659, 784].forEach((f, i) =>
+            tone(f, "sine", 0.22, 0.2, i * 0.1),
+          );
+        },
+        death: () => {
+          tone(300, "square", 0.1, 0.22);
+          tone(200, "square", 0.15, 0.2, 0.1);
+          tone(100, "sawtooth", 0.3, 0.28, 0.22);
+        },
+        win: () => {
+          [523, 659, 784, 1047, 784, 1047, 1319, 1047].forEach((f, i) =>
+            tone(f, "sine", 0.3, 0.22, i * 0.16),
+          );
+        },
+        count: () => {
+          tone(440, "triangle", 0.2, 0.22);
+        },
+        go: () => {
+          tone(660, "sine", 0.15, 0.3);
+          tone(880, "sine", 0.2, 0.25, 0.12);
+        },
+        gem: () => {
+          tone(1047, "sine", 0.08, 0.2);
+          tone(1319, "sine", 0.1, 0.16, 0.06);
+          tone(1568, "sine", 0.08, 0.12, 0.12);
+        },
+        wind: () => {
+          if (muted) return;
+          try {
+            const a = getAC(),
+              o = a.createOscillator(),
+              g = a.createGain();
+            o.connect(g);
+            g.connect(a.destination);
+            o.type = "sine";
+            o.frequency.setValueAtTime(80, a.currentTime);
+            o.frequency.linearRampToValueAtTime(140, a.currentTime + 1.5);
+            g.gain.setValueAtTime(0.04, a.currentTime);
+            g.gain.linearRampToValueAtTime(0.08, a.currentTime + 0.8);
+            g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 2.5);
+            o.start();
+            o.stop(a.currentTime + 2.8);
+          } catch (e) {}
+        },
+      };
+
+      // ── VILLAIN DEFINITIONS ──
+      const VILLAINS = [
+        {
+          id: "slider",
+          name: "Knuckles",
+          color: "#ef476f",
+          desc: "Low slider. Jump over!",
+          action: "JUMP",
+          tier: 1,
+        },
+        {
+          id: "jumper",
+          name: "Bobo",
+          color: "#ff9f1c",
+          desc: "Mid jumper. Jump over!",
+          action: "JUMP",
+          tier: 1,
+        },
+        {
+          id: "vine",
+          name: "Creepvine",
+          color: "#06d6a0",
+          desc: "Hanging vine. Duck under!",
+          action: "DUCK",
+          tier: 1,
+        },
+        {
+          id: "stone",
+          name: "Rockhead",
+          color: "#94a3b8",
+          desc: "Stone block. Jump over!",
+          action: "JUMP",
+          tier: 2,
+        },
+        {
+          id: "peel",
+          name: "Slippy",
+          color: "#ffd166",
+          desc: "Banana peel. Jump over!",
+          action: "JUMP",
+          tier: 2,
+        },
+        {
+          id: "bigbobo",
+          name: "BIG Bobo",
+          color: "#f97316",
+          desc: "Tall jumper. High jump!",
+          action: "HIGH",
+          tier: 3,
+        },
+        {
+          id: "swinger",
+          name: "Swingby",
+          color: "#a855f7",
+          desc: "Swings from top. Duck!",
+          action: "DUCK",
+          tier: 3,
+        },
+        {
+          id: "double",
+          name: "Twin Trap",
+          color: "#ec4899",
+          desc: "Two at once!",
+          action: "JUMP",
+          tier: 4,
+        },
+        {
+          id: "boulder",
+          name: "Crusher",
+          color: "#6b7280",
+          desc: "Rolling boulder.",
+          action: "JUMP",
+          tier: 4,
+        },
+        {
+          id: "spike",
+          name: "Stabby",
+          color: "#ef4444",
+          desc: "Spike wall. High jump!",
+          action: "HIGH",
+          tier: 5,
+        },
+      ];
+
+      // ── GEM DEFINITIONS ──
+      const GEMS = [
+        {
+          id: "coin",
+          emoji: "🪙",
+          name: "Gold Coin",
+          pts: 30,
+          rarity: 0.55,
+          color: "#ffd166",
+          effect: "pts",
+          desc: "+30 points",
+        },
+        {
+          id: "banana",
+          emoji: "🍌",
+          name: "Banana",
+          pts: 50,
+          rarity: 0.25,
+          color: "#fdd835",
+          effect: "pts",
+          desc: "+50 points",
+        },
+        {
+          id: "ruby",
+          emoji: "💎",
+          name: "Ruby Gem",
+          pts: 120,
+          rarity: 0.1,
+          color: "#ff4d6d",
+          effect: "pts",
+          desc: "+120 points",
+        },
+        {
+          id: "heart",
+          emoji: "❤️",
+          name: "Heart Gem",
+          pts: 0,
+          rarity: 0.05,
+          color: "#ff6b6b",
+          effect: "life",
+          desc: "+1 heart!",
+        },
+        {
+          id: "star",
+          emoji: "⭐",
+          name: "Lucky Star",
+          pts: 200,
+          rarity: 0.04,
+          color: "#ffd166",
+          effect: "pts",
+          desc: "+200 points + luck",
+        },
+        {
+          id: "clover",
+          emoji: "🍀",
+          name: "Lucky Clover",
+          pts: 150,
+          rarity: 0.03,
+          color: "#4ade80",
+          effect: "pts",
+          desc: "+150 pts + speed boost",
+        },
+        {
+          id: "crystal",
+          emoji: "🔮",
+          name: "Immunity Orb",
+          pts: 80,
+          rarity: 0.008,
+          color: "#c084fc",
+          effect: "immuno",
+          desc: "5s IMMUNITY! (rarest!)",
+        },
+        {
+          id: "diamond",
+          emoji: "💠",
+          name: "Diamond Shard",
+          pts: 300,
+          rarity: 0.002,
+          color: "#67e8f9",
+          effect: "pts",
+          desc: "+300 points (ultra rare!)",
+        },
+      ];
+
+      // ── FAIL MESSAGES ──
+      const FAILS = [
+        {
+          title: "💀 BONKED!",
+          msg: "A rock to the skull. Stars for days. ⭐",
+          col: "#ff4d6d",
+        },
+        {
+          title: "🍌 SLIPPED!",
+          msg: "Classic banana peel. No shame.",
+          col: "#ffd166",
+        },
+        {
+          title: "🐒 TACKLED!",
+          msg: "Knuckles body-slammed him. Ouch.",
+          col: "#ff9f1c",
+        },
+        {
+          title: "🌿 TANGLED!",
+          msg: "Creepvine grabbed him mid-run.",
+          col: "#06d6a0",
+        },
+        {
+          title: "🪨 CRUSHED!",
+          msg: "Crusher rolled right over Punch.",
+          col: "#94a3b8",
+        },
+        {
+          title: "👿 AMBUSHED!",
+          msg: "Twin Trap — they planned this.",
+          col: "#ec4899",
+        },
+        {
+          title: "⚡ SPIKED!",
+          msg: "Stabby came out of nowhere. Gone.",
+          col: "#ef4444",
+        },
+        {
+          title: "😵 OVERWHELMED!",
+          msg: "The whole gang showed up. It's a party.",
+          col: "#a855f7",
+        },
+      ];
+
+      // ── LEVEL CONFIGS ──
       const LEVELS = [
         {
           name: "Monkey Zoo",
           emoji: "🏛️",
           bg: "zoo",
-          speedMult: 1.0,
-          obsRate: [60, 110],
+          speed: 3.8,
+          obsCount: 10,
           desc: "Welcome to the zoo!",
         },
         {
           name: "Bamboo Forest",
           emoji: "🎋",
           bg: "bamboo",
-          speedMult: 1.08,
-          obsRate: [55, 100],
+          speed: 4.1,
+          obsCount: 11,
           desc: "Watch the bamboo!",
         },
         {
           name: "River Banks",
           emoji: "🌊",
           bg: "river",
-          speedMult: 1.16,
-          obsRate: [52, 95],
-          desc: "Slippery banks!",
-        },
-        {
-          name: "Jungle Depths",
-          emoji: "🌴",
-          bg: "jungle",
-          speedMult: 1.24,
-          obsRate: [50, 88],
-          desc: "Going deeper...",
+          speed: 4.4,
+          obsCount: 12,
+          desc: "Slippery here!",
         },
         {
           name: "Ancient Ruins",
           emoji: "🏛️",
           bg: "ruins",
-          speedMult: 1.32,
-          obsRate: [47, 82],
-          desc: "Old temple vibes",
+          speed: 4.8,
+          obsCount: 13,
+          desc: "Old temple chaos",
         },
         {
           name: "Mushroom Grove",
           emoji: "🍄",
           bg: "mushroom",
-          speedMult: 1.4,
-          obsRate: [44, 76],
-          desc: "Magic mushrooms!",
+          speed: 5.2,
+          obsCount: 14,
+          desc: "Things get weird",
         },
         {
           name: "Crystal Cave",
           emoji: "💎",
           bg: "cave",
-          speedMult: 1.48,
-          obsRate: [42, 70],
-          desc: "Shiny but dangerous",
+          speed: 5.6,
+          obsCount: 15,
+          desc: "Dark & shiny",
         },
         {
           name: "Volcano Edge",
           emoji: "🌋",
           bg: "volcano",
-          speedMult: 1.56,
-          obsRate: [40, 65],
-          desc: "HOT HOT HOT",
+          speed: 6.0,
+          obsCount: 16,
+          desc: "HOT HOT HOT!",
         },
         {
           name: "Moonlit Path",
           emoji: "🌙",
           bg: "moon",
-          speedMult: 1.64,
-          obsRate: [38, 60],
-          desc: "Almost halfway!",
-        },
-        {
-          name: "Sky Bridges",
-          emoji: "⛅",
-          bg: "sky",
-          speedMult: 1.72,
-          obsRate: [36, 56],
-          desc: "Don't look down",
-        },
-        {
-          name: "Ghost Forest",
-          emoji: "👻",
-          bg: "ghost",
-          speedMult: 1.8,
-          obsRate: [34, 52],
-          desc: "Spooky...",
-        },
-        {
-          name: "Candy Land",
-          emoji: "🍬",
-          bg: "candy",
-          speedMult: 1.88,
-          obsRate: [32, 48],
-          desc: "Deceptively sweet",
-        },
-        {
-          name: "Desert Sands",
-          emoji: "🏜️",
-          bg: "desert",
-          speedMult: 1.96,
-          obsRate: [30, 45],
-          desc: "Sandstorm incoming!",
-        },
-        {
-          name: "Ice Kingdom",
-          emoji: "❄️",
-          bg: "ice",
-          speedMult: 2.04,
-          obsRate: [28, 42],
-          desc: "Frozen grounds",
-        },
-        {
-          name: "Space Jungle",
-          emoji: "🚀",
-          bg: "space",
-          speedMult: 2.12,
-          obsRate: [26, 40],
-          desc: "Zero gravity chaos",
-        },
-        {
-          name: "Lava Flow",
-          emoji: "🔥",
-          bg: "lava",
-          speedMult: 2.2,
-          obsRate: [24, 38],
-          desc: "Final stretch begins",
-        },
-        {
-          name: "Storm Pass",
-          emoji: "⚡",
-          bg: "storm",
-          speedMult: 2.28,
-          obsRate: [22, 36],
-          desc: "Electric danger",
-        },
-        {
-          name: "Dark Valley",
-          emoji: "🕳️",
-          bg: "dark",
-          speedMult: 2.36,
-          obsRate: [20, 34],
+          speed: 6.5,
+          obsCount: 17,
           desc: "Almost there...",
         },
         {
-          name: "Golden Fields",
-          emoji: "🌾",
-          bg: "golden",
-          speedMult: 2.44,
-          obsRate: [18, 32],
-          desc: "So close!",
+          name: "Storm Valley",
+          emoji: "⚡",
+          bg: "storm",
+          speed: 7.0,
+          obsCount: 18,
+          desc: "Final stretch!",
         },
         {
-          name: "The Plushie!!!",
+          name: "THE PLUSHIE!!!",
           emoji: "🧸",
           bg: "final",
-          speedMult: 2.5,
-          obsRate: [16, 30],
-          desc: "THIS IS IT!",
+          speed: 7.5,
+          obsCount: 20,
+          desc: "THIS IS IT! 🔥",
         },
       ];
 
-      const FAIL_MESSAGES = [
-        {
-          title: "💀 BONKED!",
-          reason: "A rock to the head... Punch is seeing stars 💫",
-          color: "#ff4d6d",
+      // ── BACKGROUND THEMES ──
+      const BGTM = {
+        zoo: {
+          sky: ["#1a3a4a", "#0d1f2d"],
+          gnd: ["#4a3a1a", "#2a1a0a"],
+          acc: "#8b5e3c",
         },
-        {
-          title: "🍌 SLIPPED!",
-          reason: "Banana peel got him. Classic.",
-          color: "#ffd166",
+        bamboo: {
+          sky: ["#0d2e1a", "#071a0d"],
+          gnd: ["#2a4a1a", "#1a2a0a"],
+          acc: "#4a7a3a",
         },
-        {
-          title: "🐒 TACKLED!",
-          reason: "Three monkeys pile-on. Unfair but fair.",
-          color: "#ff9f1c",
+        river: {
+          sky: ["#0d1a3a", "#071022"],
+          gnd: ["#1a3a4a", "#0a1a2a"],
+          acc: "#3a6a8a",
         },
-        {
-          title: "🪨 STONE WALL!",
-          reason: "Face-first into ancient stone. Ouch.",
-          color: "#94a3b8",
+        ruins: {
+          sky: ["#2a1a0a", "#1a0a05"],
+          gnd: ["#3a2a1a", "#1a1a0a"],
+          acc: "#7a6a4a",
         },
-        {
-          title: "🌿 TANGLED!",
-          reason: "Vines grabbed him. The jungle fights back.",
-          color: "#06d6a0",
+        mushroom: {
+          sky: ["#2a0a2a", "#1a051a"],
+          gnd: ["#3a1a3a", "#1a0a1a"],
+          acc: "#8a3a8a",
         },
-        {
-          title: "💥 AMBUSHED!",
-          reason: "Jumping monkey came outta nowhere!",
-          color: "#ff6b35",
+        cave: {
+          sky: ["#0a0a1a", "#050510"],
+          gnd: ["#1a1a2a", "#0a0a1a"],
+          acc: "#3a3a6a",
         },
-        {
-          title: "😤 SURROUNDED!",
-          reason: "The whole gang showed up. Respect though.",
-          color: "#ef476f",
+        volcano: {
+          sky: ["#2a0a00", "#1a0500"],
+          gnd: ["#3a1a0a", "#1a0a05"],
+          acc: "#ff4a00",
         },
-      ];
+        moon: {
+          sky: ["#0a0a2a", "#05051a"],
+          gnd: ["#1a1a3a", "#0a0a1a"],
+          acc: "#4a4a8a",
+        },
+        storm: {
+          sky: ["#0a0a0a", "#050508"],
+          gnd: ["#1a1a0a", "#0a0a05"],
+          acc: "#dfdf00",
+        },
+        final: {
+          sky: ["#1a0a2e", "#0d0420"],
+          gnd: ["#2d1b69", "#1a0a3e"],
+          acc: "#ff6b35",
+        },
+      };
 
-      // ---- RARE COLLECTIBLES ----
-      const RARE_ITEMS = [
-        { emoji: "⭐", name: "STAR BONUS!", points: 200, color: "#ffd166" },
-        { emoji: "💎", name: "DIAMOND! +500", points: 500, color: "#67e8f9" },
-        { emoji: "🎋", name: "BAMBOO LUCK!", points: 150, color: "#86efac" },
-        { emoji: "🌺", name: "RARE FLOWER!", points: 300, color: "#f9a8d4" },
-        { emoji: "🔮", name: "MYSTIC ORB!", points: 400, color: "#c4b5fd" },
-        { emoji: "🍀", name: "LUCKY CLOVER!", points: 250, color: "#4ade80" },
-      ];
-
-      // ---- GAME STATE ----
-      let state = "idle";
+      // ── GAME STATE ──
+      let gameState = "idle"; // idle|howtoplay|playing|paused|over|won|transition
       let score = 0,
         bestScore = 0,
         bestLevel = 1;
-      let level = 1;
-      let distance = 0,
-        levelDist = 500;
-      let lives = 3,
-        maxLives = 3;
-      let speed = 4.5;
-      let frame = 0;
-      let hitCooldown = 0;
-      let devMode = false;
+      let level = 1,
+        lives = 3;
+      let obsBeaten = 0,
+        obsNeeded = 10; // level completion = beat N obstacles
+      let speed = 3.8,
+        frame = 0,
+        hitCD = 0,
+        immunoTimer = 0;
+      let devMode = false,
+        speedBoost = 0;
+      let gemsCollected = 0,
+        gemsTotal = 0,
+        gemTypes = {};
       let particles = [],
         obstacles = [],
         collectibles = [],
-        scorePopups = [];
-      let obsCooldown = 80,
-        colCooldown = 130;
-      let gameStartTime = 0;
-      let preBeforeUnloadPaused = false;
+        bgObjs = [];
+      let obsSpawnCD = 50,
+        colSpawnCD = 100;
+      let startTime = 0;
+      let bgX = [0, 0, 0, 0]; // parallax layers
 
-      // Load saved data
-      function loadSaved() {
-        try {
-          bestScore = parseInt(localStorage.getItem("punch_best") || "0");
-          bestLevel = parseInt(localStorage.getItem("punch_best_level") || "1");
-          document.getElementById("best-score-title").textContent =
-            bestScore || "-";
-          document.getElementById("best-level-title").textContent =
-            bestLevel > 1 ? bestLevel : "-";
-        } catch (e) {}
-      }
-      function saveBest() {
-        try {
-          if (score > bestScore) {
-            bestScore = score;
-            localStorage.setItem("punch_best", bestScore);
-          }
-          if (level > bestLevel) {
-            bestLevel = level;
-            localStorage.setItem("punch_best_level", bestLevel);
-          }
-        } catch (e) {}
-      }
-      loadSaved();
-
-      // ---- PUNCH ----
-      let punch = {
+      // ── PUNCH ──
+      const P = {
         x: 0,
         y: 0,
         w: 0,
         h: 0,
         vy: 0,
+        jc: 0,
         jumping: false,
-        jumpCount: 0,
         sliding: false,
-        slideTimer: 0,
-        animFrame: 0,
-        animTimer: 0,
-        get hitY() {
+        slideT: 0,
+        aF: 0,
+        aT: 0,
+        get hy() {
           return this.y - (this.sliding ? this.h * 0.5 : this.h);
         },
-        get hitH() {
+        get hh() {
           return this.sliding ? this.h * 0.5 : this.h;
         },
       };
 
-      function initPunch() {
-        punch.w = Math.round(44 * GC_RATIO);
-        punch.h = Math.round(52 * GC_RATIO);
-        punch.x = Math.round(W * 0.15);
-        punch.y = GROUND;
-        punch.vy = 0;
-        punch.jumping = false;
-        punch.jumpCount = 0;
-        punch.sliding = false;
-        punch.slideTimer = 0;
+      function initP() {
+        P.w = Math.round(44 * S);
+        P.h = Math.round(52 * S);
+        P.x = Math.round(W * 0.14);
+        P.y = GR;
+        P.vy = 0;
+        P.jc = 0;
+        P.jumping = false;
+        P.sliding = false;
+        P.slideT = 0;
+        P.aF = 0;
+        P.aT = 0;
       }
 
-      // ---- PARALLAX BG ----
-      let bgOffset = [0, 0, 0, 0];
+      // ── LOAD/SAVE ──
+      function loadSaved() {
+        try {
+          bestScore = parseInt(localStorage.getItem("pmx_best") || "0");
+          bestLevel = parseInt(localStorage.getItem("pmx_blv") || "1");
+        } catch (e) {}
+        document.getElementById("best-sc").textContent = bestScore || "—";
+        document.getElementById("best-lv").textContent =
+          bestLevel > 1 ? bestLevel : "—";
+      }
+      function saveBest() {
+        try {
+          if (score > bestScore) {
+            bestScore = score;
+            localStorage.setItem("pmx_best", bestScore);
+          }
+          if (level > bestLevel) {
+            bestLevel = level;
+            localStorage.setItem("pmx_blv", bestLevel);
+          }
+        } catch (e) {}
+      }
+      loadSaved();
 
-      // ---- INPUT ----
-      const keys = {};
+      // ── INPUT ──
+      const K = {};
       document.addEventListener("keydown", (e) => {
-        if (keys[e.code]) return;
-        keys[e.code] = true;
-        const playing = state === "playing";
-
+        if (K[e.code]) return;
+        K[e.code] = true;
         if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
           e.preventDefault();
-          if (playing) doJump();
-          else if (state === "idle" || state === "howtoplay") {
-          }
+          if (gameState === "playing") doJump();
         }
         if (e.code === "ArrowDown" || e.code === "KeyS") {
           e.preventDefault();
-          if (playing) doSlide();
+          if (gameState === "playing") doSlide();
         }
         if (
           (e.code === "KeyP" || e.code === "Escape") &&
-          (playing || state === "paused")
+          (gameState === "playing" || gameState === "paused")
         ) {
           e.preventDefault();
           togglePause();
         }
-        if (e.code === "KeyL" && playing) {
+        if (e.code === "KeyL" && gameState === "playing") {
           devMode = !devMode;
-          document
-            .getElementById("dev-badge")
-            .classList.toggle("show", devMode);
+          document.getElementById("dev-badge").classList.toggle("on", devMode);
           if (devMode) {
             speed *= 0.4;
-            lives = Math.max(lives, 3);
-            updateHeartsDisplay();
-            sfxRare();
-          } else {
-            recalcSpeed();
-          }
+            lives = Math.max(lives, 5);
+          } else recalcSpeed();
+          sfx.rare();
         }
+        if (e.code === "ArrowRight" && gameState === "playing") {
+          speedBoost = 60;
+        } // speed burst
       });
       document.addEventListener("keyup", (e) => {
-        keys[e.code] = false;
-        if ((e.code === "ArrowDown" || e.code === "KeyS") && punch.sliding) {
-          punch.sliding = false;
-          punch.slideTimer = 0;
+        K[e.code] = false;
+        if ((e.code === "ArrowDown" || e.code === "KeyS") && P.sliding) {
+          P.sliding = false;
+          P.slideT = 0;
+        }
+        if (e.code === "ArrowRight") {
+          speedBoost = 0;
         }
       });
 
-      function mobileJump() {
-        if (state === "playing") doJump();
-      }
-      function mobileSlideStart() {
-        if (state === "playing") doSlide();
-      }
-      function mobileSlideEnd() {
-        punch.sliding = false;
-        punch.slideTimer = 0;
-      }
-
-      // Swipe detection
-      let touchStartY = 0,
-        touchStartX = 0;
-      canvas.addEventListener(
+      // Touch / swipe
+      let tsy = 0,
+        tsx = 0,
+        tsT = 0;
+      document.addEventListener(
         "touchstart",
         (e) => {
-          e.preventDefault();
-          touchStartY = e.touches[0].clientY;
-          touchStartX = e.touches[0].clientX;
+          tsy = e.touches[0].clientY;
+          tsx = e.touches[0].clientX;
+          tsT = Date.now();
         },
-        { passive: false },
+        { passive: true },
       );
-      canvas.addEventListener(
+      document.addEventListener(
         "touchend",
         (e) => {
-          e.preventDefault();
-          const dy = touchStartY - e.changedTouches[0].clientY;
-          const dx = touchStartX - e.changedTouches[0].clientX;
-          if (state === "playing") {
-            if (dy > 20) doJump();
-            else if (dy < -20) {
-              punch.sliding = true;
-              punch.slideTimer = 40;
-            } else if (Math.abs(dy) < 15 && Math.abs(dx) < 30) doJump(); // tap = jump
+          if (gameState !== "playing") return;
+          const dy = tsy - e.changedTouches[0].clientY;
+          const dx = tsx - e.changedTouches[0].clientX;
+          const dt = Date.now() - tsT;
+          if (Math.abs(dy) > Math.abs(dx)) {
+            if (dy > 18) doJump();
+            else if (dy < -18) {
+              P.sliding = true;
+              P.slideT = 45;
+            }
+          } else {
+            if (dx > 30 && dt < 300) speedBoost = 80; // swipe right = speed boost
+            if (Math.abs(dy) < 15 && Math.abs(dx) < 20) doJump(); // tap = jump
           }
         },
-        { passive: false },
+        { passive: true },
       );
 
+      function mJump() {
+        if (gameState === "playing") doJump();
+      }
+      function mSlide(on) {
+        if (gameState === "playing" && on) {
+          P.sliding = true;
+          P.slideT = 45;
+        } else {
+          P.sliding = false;
+          P.slideT = 0;
+        }
+      }
+
       function doJump() {
-        if (punch.jumpCount < 2) {
-          punch.vy =
-            punch.jumpCount === 0
-              ? -14 * GC_RATIO * 0.85
-              : -11 * GC_RATIO * 0.85;
-          punch.jumping = true;
-          punch.jumpCount++;
-          punch.sliding = false;
-          spawnParticles(punch.x + punch.w / 2, punch.y, "#ffd166", 5);
-          punch.jumpCount === 1 ? sfxJump() : sfxDoubleJump();
+        if (P.jc < 2) {
+          P.vy = P.jc === 0 ? -15 * S * 0.82 : -12 * S * 0.82;
+          P.jumping = true;
+          P.jc++;
+          P.sliding = false;
+          spawnPtcl(P.x + P.w / 2, P.y, "#ffd166", 5);
+          P.jc === 1 ? sfx.jump() : sfx.djump();
         }
       }
-
       function doSlide() {
-        if (!punch.jumping) {
-          if (!punch.sliding) sfxSlide();
-          punch.sliding = true;
-          punch.slideTimer = 45;
+        if (!P.jumping) {
+          if (!P.sliding) sfx.slide();
+          P.sliding = true;
+          P.slideT = 45;
         }
       }
 
-      // ---- PAUSE LOGIC ----
-      let pauseResumePhase = 0;
-      function togglePause() {
-        if (state === "playing") {
-          state = "paused";
-          stopBgMusic();
-          pauseResumePhase = 0;
-          showScreen("pause-screen");
-          document.getElementById("pause-btn").textContent = "▶";
-          document.getElementById("countdown-display").style.display = "none";
-        } else if (state === "paused") {
-          resumeGame();
+      // ── SCREENS ──
+      function showScr(id) {
+        document
+          .querySelectorAll(".scr")
+          .forEach((s) => s.classList.remove("on"));
+        document.getElementById(id).classList.add("on");
+      }
+      function showHUD(v) {
+        document.getElementById("hud").classList.toggle("on", v);
+        document.getElementById("top-btns").classList.toggle("on", v);
+        document
+          .getElementById("mob-ctrl")
+          .classList.toggle("on", v && isMobile());
+      }
+      function isMobile() {
+        return window.innerWidth < 900 || "ontouchstart" in window;
+      }
+
+      function goHow() {
+        buildCtrlGrid();
+        buildHowGems();
+        buildHowVillains();
+        showScr("scr-how");
+      }
+      function goAbout() {
+        buildAboutVillains();
+        buildAboutGems();
+        showScr("scr-about");
+      }
+      function goTitle() {
+        gameState = "idle";
+        stopMusic();
+        cancelAnimationFrame(animID);
+        showScr("scr-title");
+        showHUD(false);
+        loadSaved();
+        setTimeout(() => startMusic("title"), 300);
+      }
+      function pauseOnCoffee() {
+        if (gameState === "playing") {
+          gameState = "paused";
+          stopMusic();
+          showScr("scr-pause");
+          document.getElementById("hud-pause").textContent = "▶";
         }
+      }
+
+      function buildCtrlGrid() {
+        const mobile = isMobile();
+        const ctrl = document.getElementById("ctrl-grid");
+        const cards = mobile
+          ? [
+              { k: "Swipe ↑ / Tap", d: "Jump (tap again = double jump)" },
+              { k: "Swipe ↓", d: "Slide / duck under vines" },
+              { k: "Swipe → ", d: "Speed burst!" },
+              { k: "P / ESC", d: "Pause / Resume (3-2-1)" },
+            ]
+          : [
+              { k: "SPACE / ↑ / W", d: "Jump (double jump!)" },
+              { k: "↓ / S", d: "Slide / duck under vines" },
+              { k: "→ / ArrowRight", d: "Speed burst!" },
+              { k: "P / ESC", d: "Pause — 3-2-1 to resume" },
+              { k: "L key", d: "🔧 Dev mode — slow + revive" },
+              { k: "A / ← ", d: "(future: roll)" },
+            ];
+        ctrl.innerHTML = cards
+          .map(
+            (c) =>
+              `<div class="ctrl-card"><div class="ctrl-key">${c.k}</div><div class="ctrl-desc">${c.d}</div></div>`,
+          )
+          .join("");
+      }
+      function buildHowGems() {
+        document.getElementById("gem-grid-how").innerHTML = GEMS.map(
+          (g) =>
+            `<div class="gem-card"><div class="gem-ico">${g.emoji}</div><div class="gem-nm"><b>${g.name}</b><br>${g.desc}</div></div>`,
+        ).join("");
+      }
+      function buildHowVillains() {
+        document.getElementById("villain-list-how").innerHTML = VILLAINS.map(
+          (v) => `<div class="vbadge">${v.name} — <b>${v.action}</b></div>`,
+        ).join("");
+      }
+      function buildAboutVillains() {
+        document.getElementById("villain-about-list").innerHTML = VILLAINS.map(
+          (v) =>
+            `<li><strong>${v.name}</strong> (${v.id}) — ${v.desc} Tier ${v.tier}.</li>`,
+        ).join("");
+      }
+      function buildAboutGems() {
+        document.getElementById("gem-about-list").innerHTML = GEMS.map(
+          (g) =>
+            `<li>${g.emoji} <strong>${g.name}</strong> — ${g.desc} (rarity ${Math.round(g.rarity * 100)}%)</li>`,
+        ).join("");
+      }
+
+      // ── PAUSE ──
+      let resuming = false;
+      function togglePause() {
+        if (gameState === "playing") {
+          gameState = "paused";
+          stopMusic();
+          showScr("scr-pause");
+          document.getElementById("hud-pause").textContent = "▶";
+          document.getElementById("countdown").style.display = "none";
+        } else if (gameState === "paused") resumeGame();
       }
       function resumeGame() {
-        if (pauseResumePhase > 0) return;
-        pauseResumePhase = 1;
-        const cd = document.getElementById("countdown-display");
+        if (resuming) return;
+        resuming = true;
+        const cd = document.getElementById("countdown");
         cd.style.display = "block";
-        let count = 3;
-        cd.textContent = count;
-        sfxCountdown();
+        cd.textContent = "3";
+        sfx.count();
+        let c = 3;
         const iv = setInterval(() => {
-          count--;
-          if (count > 0) {
-            cd.textContent = count;
-            sfxCountdown();
+          c--;
+          if (c > 0) {
+            cd.textContent = c;
+            sfx.count();
           } else {
             clearInterval(iv);
             cd.textContent = "GO!";
-            sfxGo();
+            sfx.go();
             setTimeout(() => {
-              state = "playing";
-              hideScreen("pause-screen");
-              document.getElementById("pause-btn").textContent = "⏸";
-              pauseResumePhase = 0;
-              playBgMusic();
+              gameState = "playing";
+              showScr("scr-title");
+              document
+                .querySelectorAll(".scr")
+                .forEach((s) => s.classList.remove("on"));
+              document.getElementById("hud-pause").textContent = "⏸";
+              cd.style.display = "none";
+              resuming = false;
+              startMusic("game");
               loop();
             }, 400);
           }
         }, 800);
       }
 
-      function pauseForCoffee() {
-        if (state === "playing") {
-          state = "paused";
-          stopBgMusic();
-          showScreen("pause-screen");
-        }
-      }
-
-      // ---- SCREEN MANAGEMENT ----
-      function showScreen(id) {
-        document
-          .querySelectorAll(".screen")
-          .forEach((s) => s.classList.remove("active"));
-        document.getElementById(id).classList.add("active");
-      }
-      function hideScreen(id) {
-        document.getElementById(id).classList.remove("active");
-      }
-      function showHUD(show) {
-        document.getElementById("hud").classList.toggle("show", show);
-        document.getElementById("coffee-btn").classList.toggle("show", show);
-        document
-          .getElementById("mobile-controls")
-          .classList.toggle("show", show && isMobile());
-      }
-      function isMobile() {
-        return window.innerWidth < 768 || "ontouchstart" in window;
-      }
-
-      function goToTitle() {
-        state = "idle";
-        stopBgMusic();
-        showScreen("title-screen");
-        showHUD(false);
-        loadSaved();
-        document.getElementById("best-score-title").textContent =
-          bestScore || "-";
-        document.getElementById("best-level-title").textContent =
-          bestLevel > 1 ? bestLevel : "-";
-      }
-      function goToHowToPlay() {
-        showScreen("howtoplay-screen");
-      }
-      function startGameDirect() {
-        initGame();
-        startLevel(1);
-      }
-
-      // ---- LEVEL TOAST ----
-      function showLevelToast(lvl, cb) {
-        const t = document.getElementById("level-toast");
-        const lc = LEVELS[lvl - 1];
-        document.getElementById("toast-num").textContent = lvl;
-        document.getElementById("toast-label").textContent =
-          lvl === 20 ? "🏆 FINAL LEVEL" : "LEVEL START";
-        document.getElementById("toast-bg").textContent =
-          lc.emoji + " " + lc.name;
-        t.style.display = "block";
-        sfxLevelUp();
-        setTimeout(() => {
-          t.style.display = "none";
-          if (cb) cb();
-        }, 1800);
-      }
-
-      // ---- GAME INIT ----
-      function initGame() {
+      // ── GAME INIT ──
+      let animID;
+      function startGame() {
+        stopMusic();
         score = 0;
         level = 1;
         lives = 3;
-        distance = 0;
         frame = 0;
+        hitCD = 0;
+        immunoTimer = 0;
+        gemsCollected = 0;
+        gemsTotal = 0;
+        gemTypes = {};
         obstacles = [];
         collectibles = [];
         particles = [];
-        scorePopups = [];
-        obsCooldown = 80;
-        colCooldown = 130;
-        hitCooldown = 0;
+        speedBoost = 0;
         devMode = false;
-        document.getElementById("dev-badge").classList.remove("show");
-        gameStartTime = Date.now();
+        document.getElementById("dev-badge").classList.remove("on");
+        startTime = Date.now();
         showHUD(true);
-        showScreen("title-screen"); // temporarily
-        updateHeartsDisplay();
-        updateScoreDisplay();
+        updateHUD();
+        initLevel(1);
       }
-
-      function startLevel(lvl) {
-        level = lvl;
-        distance = 0;
-        recalcSpeed();
+      function initLevel(lv) {
+        level = lv;
+        const lc = LEVELS[lv - 1];
+        obsBeaten = 0;
+        obsNeeded = lc.obsCount;
         obstacles = [];
         collectibles = [];
-        obsCooldown = 60;
-        initPunch();
-        bgOffset = [0, 0, 0, 0];
-        updateLevelDisplay();
-        hideScreen("pause-screen");
+        recalcSpeed();
+        initP();
+        bgX = [0, 0, 0, 0];
+        updateHUD();
         document
-          .querySelectorAll(".screen")
-          .forEach((s) => s.classList.remove("active"));
-
-        showLevelToast(lvl, () => {
-          state = "playing";
-          playBgMusic();
+          .querySelectorAll(".scr")
+          .forEach((s) => s.classList.remove("on"));
+        showLevelToast(lv, () => {
+          gameState = "playing";
+          startMusic("game");
+          cancelAnimationFrame(animID);
           loop();
         });
       }
-
       function recalcSpeed() {
-        const lc = LEVELS[Math.min(level - 1, LEVELS.length - 1)];
-        speed = (devMode ? 2.5 : 4.5) * lc.speedMult;
+        const lc = LEVELS[Math.min(level - 1, 9)];
+        speed = devMode
+          ? lc.speed * 0.35
+          : lc.speed + (speedBoost > 0 ? 1.5 : 0);
       }
 
-      // ---- LEVEL PROGRESS ----
-      function checkLevelComplete() {
-        if (distance >= levelDist) {
-          if (level >= 20) {
-            triggerWin();
-            return true;
-          }
-          state = "transition";
-          stopBgMusic();
-          saveBest();
-          setTimeout(() => {
-            startLevel(level + 1);
-          }, 200);
-          return true;
-        }
-        return false;
+      // ── LEVEL TOAST ──
+      function showLevelToast(lv, cb) {
+        const lc = LEVELS[lv - 1];
+        document.getElementById("toast-num").textContent = lv;
+        document.getElementById("toast-sub").textContent =
+          lv === 10 ? "🏆 FINAL LEVEL!" : "LEVEL " + lv;
+        document.getElementById("toast-bg").textContent =
+          lc.emoji + " " + lc.name + " — " + lc.desc;
+        document.getElementById("toast").style.display = "block";
+        sfx.lvlup();
+        setTimeout(() => {
+          document.getElementById("toast").style.display = "none";
+          if (cb) cb();
+        }, 2000);
       }
 
-      // ---- OBSTACLES ----
-      function spawnObstacle() {
-        const lc = LEVELS[Math.min(level - 1, LEVELS.length - 1)];
-        const r = Math.random();
-        let type, y, w, h;
+      // ── HUD UPDATE ──
+      function updateHUD() {
+        let h = "";
+        for (let i = 0; i < lives; i++) h += "❤️";
+        for (let i = lives; i < 3; i++) h += "🖤";
+        document.getElementById("hud-hearts").textContent = h || "💀";
+        document.getElementById("hud-level").textContent = "LVL " + level;
+        document.getElementById("hud-score").textContent = score;
+        document.getElementById("hud-gems").textContent = "💎" + gemsCollected;
+        document.getElementById("hud-prog").style.width =
+          (obsBeaten / obsNeeded) * 100 + "%";
+        document.getElementById("hud-immuno").style.display =
+          immunoTimer > 0 ? "block" : "none";
+      }
 
-        // More variety at higher levels
-        if (level <= 3) {
-          if (r < 0.45) type = "slider";
-          else if (r < 0.8) type = "jumper";
-          else type = "vine";
-        } else if (level <= 8) {
-          if (r < 0.3) type = "slider";
-          else if (r < 0.55) type = "jumper";
-          else if (r < 0.75) type = "vine";
-          else if (r < 0.88) type = "stone";
-          else type = "banana_peel";
-        } else {
-          const types = [
-            "slider",
-            "jumper",
-            "vine",
-            "stone",
-            "banana_peel",
-            "double",
-          ];
-          type = types[Math.floor(r * types.length)];
-        }
-
-        w = Math.round(48 * GC_RATIO);
-        h = Math.round(44 * GC_RATIO);
-
-        if (type === "vine") y = GROUND - Math.round(90 * GC_RATIO);
-        else if (type === "stone") {
-          y = GROUND;
-          h = Math.round(36 * GC_RATIO);
-        } else y = GROUND;
-
-        obstacles.push({
-          type,
+      // ── OBSTACLE SPAWNING ──
+      function getVillainsForLevel(lv) {
+        // unlock villains progressively
+        if (lv <= 2) return VILLAINS.filter((v) => v.tier === 1);
+        if (lv <= 4) return VILLAINS.filter((v) => v.tier <= 2);
+        if (lv <= 6) return VILLAINS.filter((v) => v.tier <= 3);
+        if (lv <= 8) return VILLAINS.filter((v) => v.tier <= 4);
+        return VILLAINS;
+      }
+      function spawnObs() {
+        const pool = getVillainsForLevel(level);
+        const v = pool[Math.floor(Math.random() * pool.length)];
+        const w = Math.round(50 * S),
+          hBase = Math.round(46 * S);
+        let ob = {
+          type: v.id,
+          villain: v,
           x: W + 20,
-          y,
           w,
-          h,
-          animFrame: 0,
+          h: hBase,
+          y: GR,
+          animF: 0,
           passed: false,
-        });
-
-        if (type === "double") {
+        };
+        if (v.id === "vine" || v.id === "swinger")
+          ob.y = GR - Math.round(100 * S);
+        if (v.id === "bigbobo") ob.h = Math.round(68 * S);
+        if (v.id === "boulder") ob.w = ob.h = Math.round(42 * S);
+        if (v.id === "spike") ob.w = Math.round(30 * S);
+        obstacles.push(ob);
+        // double trap spawns a second
+        if (v.id === "double") {
           obstacles.push({
             type: "jumper",
-            x: W + Math.round(90 * GC_RATIO),
-            y: GROUND,
+            villain: VILLAINS[1],
+            x: W + Math.round(90 * S),
             w,
-            h,
-            animFrame: 0,
+            h: hBase,
+            y: GR,
+            animF: 0,
             passed: false,
           });
         }
       }
-
-      function spawnCollectible() {
-        const isRare = Math.random() < 0.06;
-        if (isRare) {
-          const ri = RARE_ITEMS[Math.floor(Math.random() * RARE_ITEMS.length)];
-          collectibles.push({
-            x: W + 20,
-            y: GROUND - Math.round((50 + Math.random() * 60) * GC_RATIO),
-            r: Math.round(12 * GC_RATIO),
-            collected: false,
-            rare: true,
-            rareData: ri,
-          });
-        } else {
-          collectibles.push({
-            x: W + 20,
-            y: GROUND - Math.round((40 + Math.random() * 70) * GC_RATIO),
-            r: Math.round(10 * GC_RATIO),
-            collected: false,
-            rare: false,
-          });
+      function spawnCol() {
+        // weighted random gem
+        const r = Math.random();
+        let cum = 0,
+          gem = GEMS[0];
+        for (const g of GEMS) {
+          cum += g.rarity;
+          if (r < cum) {
+            gem = g;
+            break;
+          }
         }
+        gemsTotal++;
+        collectibles.push({
+          x: W + 20,
+          y: GR - Math.round((40 + Math.random() * 70) * S),
+          r: Math.round(11 * S),
+          gem,
+          collected: false,
+        });
       }
 
-      // ---- PARTICLES ----
-      function spawnParticles(x, y, color, n = 8) {
-        for (let i = 0; i < n; i++) {
+      // ── PARTICLES ──
+      function spawnPtcl(x, y, col, n = 8) {
+        for (let i = 0; i < n; i++)
           particles.push({
             x,
             y,
-            vx: (Math.random() - 0.5) * 5 * GC_RATIO,
-            vy: -Math.random() * 5 * GC_RATIO - GC_RATIO,
+            vx: (Math.random() - 0.5) * 5 * S,
+            vy: -Math.random() * 5 * S - S,
             life: 40 + Math.random() * 20,
             maxLife: 60,
-            color,
-            r: (3 + Math.random() * 4) * GC_RATIO,
+            col,
+            r: (3 + Math.random() * 4) * S,
           });
-        }
       }
 
-      // ---- SCORE POPUP ----
-      function addScorePopup(x, y, text, color) {
-        const el = document.createElement("div");
-        el.className = "score-pop";
-        el.textContent = text;
-        el.style.color = color || "#ffd166";
-        el.style.left =
-          x + document.getElementById("game-container").offsetLeft + "px";
-        el.style.top =
-          y +
-          document.getElementById("hud").offsetHeight +
-          document.getElementById("game-outer").offsetTop +
-          "px";
-        document.getElementById("game-outer").appendChild(el);
-        setTimeout(() => el.remove(), 900);
-      }
-
-      // ---- UPDATE ----
+      // ── UPDATE ──
       function update() {
         frame++;
-        distance += speed * 0.5;
-        score += Math.floor(speed * 0.08 + level * 0.02);
+        if (hitCD > 0) hitCD--;
+        if (immunoTimer > 0) {
+          immunoTimer--;
+          if (immunoTimer === 0) sfx.hit();
+        }
+        if (speedBoost > 0) speedBoost--;
+        recalcSpeed();
 
-        if (hitCooldown > 0) hitCooldown--;
-
-        // Progress bar
-        document.getElementById("progress-bar").style.width =
-          Math.min((distance / levelDist) * 100, 100) + "%";
-
-        if (checkLevelComplete()) return;
+        score += Math.floor(speed * 0.07 + level * 0.03);
 
         // Parallax
-        const lc = LEVELS[Math.min(level - 1, LEVELS.length - 1)];
-        bgOffset[0] = (bgOffset[0] + 0.3) % (W * 2);
-        bgOffset[1] = (bgOffset[1] + speed * 0.3) % (W * 1.5);
-        bgOffset[2] = (bgOffset[2] + speed * 0.6) % W;
-        bgOffset[3] = (bgOffset[3] + speed * 0.9) % W;
+        bgX[0] = (bgX[0] + 0.25) % (W * 2);
+        bgX[1] = (bgX[1] + speed * 0.25) % (W * 1.5);
+        bgX[2] = (bgX[2] + speed * 0.55) % W;
+        bgX[3] = (bgX[3] + speed * 0.85) % W;
 
         // Punch physics
-        if (punch.sliding) {
-          punch.slideTimer--;
-          if (punch.slideTimer <= 0) punch.sliding = false;
+        if (P.sliding) {
+          P.slideT--;
+          if (P.slideT <= 0) P.sliding = false;
         }
-        const gravity = 0.55 * GC_RATIO;
-        punch.vy += gravity;
-        punch.y += punch.vy;
-        if (punch.y >= GROUND) {
-          punch.y = GROUND;
-          punch.vy = 0;
-          punch.jumping = false;
-          punch.jumpCount = 0;
+        P.vy += 0.55 * S;
+        P.y += P.vy;
+        if (P.y >= GR) {
+          P.y = GR;
+          P.vy = 0;
+          P.jumping = false;
+          P.jc = 0;
         }
-        punch.animTimer++;
-        if (punch.animTimer > 7) {
-          punch.animTimer = 0;
-          punch.animFrame = (punch.animFrame + 1) % 4;
-        }
-
-        // Obstacles
-        const spawnRate =
-          LEVELS[Math.min(level - 1, LEVELS.length - 1)].obsRate;
-        obsCooldown--;
-        if (obsCooldown <= 0) {
-          spawnObstacle();
-          obsCooldown =
-            spawnRate[0] + Math.random() * (spawnRate[1] - spawnRate[0]);
+        P.aT++;
+        if (P.aT > 7) {
+          P.aT = 0;
+          P.aF = (P.aF + 1) % 4;
         }
 
+        // Spawn obstacles
+        obsSpawnCD--;
+        if (obsSpawnCD <= 0 && obstacles.length < 8) {
+          spawnObs();
+          // Gap = bigger at start of level, tighter at end
+          const progress = obsBeaten / obsNeeded;
+          const minGap = Math.max(35, 70 - level * 3 - progress * 20);
+          const maxGap = Math.max(60, 130 - level * 4 - progress * 30);
+          obsSpawnCD = minGap + Math.random() * (maxGap - minGap);
+        }
+        // Spawn gems
+        colSpawnCD--;
+        if (colSpawnCD <= 0) {
+          spawnCol();
+          colSpawnCD = 70 + Math.random() * 80;
+        }
+
+        // Move obstacles
         for (let i = obstacles.length - 1; i >= 0; i--) {
           const o = obstacles[i];
           o.x -= speed;
-          o.animFrame = frame % 14 < 7 ? 0 : 1;
-
-          // Check if player jumped over (whoosh sfx)
-          if (!o.passed && o.x + o.w < punch.x) {
+          o.animF = frame % 14 < 7 ? 0 : 1;
+          // Passed check
+          if (!o.passed && o.x + o.w < P.x) {
             o.passed = true;
-            if (punch.y < GROUND - punch.h * 0.3) sfxMiss(); // jumped over
-            score += 5;
+            obsBeaten++;
+            sfx.mkpass();
+            score += 8 + level * 2;
+            updateHUD();
+            if (obsBeaten >= obsNeeded) {
+              triggerLevelComplete();
+              return;
+            }
           }
-
           // Collision
-          if (hitCooldown === 0) {
-            const margin = Math.round(8 * GC_RATIO);
-            const px = punch.x + margin,
-              pw = punch.w - margin * 2;
-            const py = punch.hitY + margin * 0.5,
-              ph = punch.hitH - margin;
-
+          if (hitCD === 0 && immunoTimer === 0) {
+            const mg = Math.round(7 * S);
+            const px = P.x + mg,
+              pw = P.w - mg * 2;
+            const py = P.hy + mg * 0.5,
+              ph = P.hh - mg;
             let ox, ow, oy, oh;
-            if (o.type === "vine") {
-              ox = o.x + margin / 2;
-              ow = o.w - margin;
+            if (o.type === "vine" || o.type === "swinger") {
+              ox = o.x + mg / 2;
+              ow = o.w - mg;
               oy = o.y;
-              oh = Math.round(H * 0.02 + 12 * GC_RATIO);
+              oh = Math.round(15 * S);
             } else {
-              ox = o.x + margin;
-              ow = o.w - margin * 2;
-              oy = o.y - o.h + margin;
-              oh = o.h - margin;
+              ox = o.x + mg;
+              ow = o.w - mg * 2;
+              oy = o.y - o.h + mg;
+              oh = o.h - mg;
             }
-
             if (px < ox + ow && px + pw > ox && py < oy + oh && py + ph > oy) {
-              takeDamage();
+              takeDmg(o);
             }
           }
-
           if (o.x < -100) obstacles.splice(i, 1);
         }
 
-        // Collectibles
-        colCooldown--;
-        if (colCooldown <= 0) {
-          spawnCollectible();
-          colCooldown = 80 + Math.random() * 80;
-        }
-
+        // Move collectibles
         for (let i = collectibles.length - 1; i >= 0; i--) {
           const c = collectibles[i];
           c.x -= speed;
           if (!c.collected) {
-            const margin = c.r + Math.round(4 * GC_RATIO);
-            if (
-              Math.abs(punch.x + punch.w / 2 - c.x) < margin &&
-              Math.abs(punch.hitY + punch.hitH / 2 - c.y) <
-                margin + punch.hitH / 2
-            ) {
+            const d = Math.hypot(P.x + P.w / 2 - c.x, P.hy + P.hh / 2 - c.y);
+            if (d < c.r + P.w * 0.4) {
               c.collected = true;
-              if (c.rare) {
-                score += c.rareData.points;
-                sfxRare();
-                const rb = document.getElementById("rare-banner");
-                rb.textContent = c.rareData.emoji + " " + c.rareData.name;
-                rb.classList.remove("show");
-                void rb.offsetWidth;
-                rb.classList.add("show");
-                spawnParticles(c.x, c.y, c.rareData.color, 20);
-              } else {
-                score += 30 + level * 2;
-                sfxBanana();
-                spawnParticles(c.x, c.y, "#ffd166", 8);
-              }
-              updateScoreDisplay();
+              collectGem(c);
             }
           }
-          if (c.x < -30) collectibles.splice(i, 1);
+          if (c.x < -40) collectibles.splice(i, 1);
         }
 
         // Particles
@@ -1920,902 +2261,774 @@
           const p = particles[i];
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.15 * GC_RATIO;
+          p.vy += 0.15 * S;
           p.life--;
           if (p.life <= 0) particles.splice(i, 1);
         }
 
-        updateScoreDisplay();
+        updateHUD();
       }
 
-      function takeDamage() {
+      function collectGem(c) {
+        const g = c.gem;
+        gemsCollected++;
+        if (!gemTypes[g.id]) gemTypes[g.id] = 0;
+        gemTypes[g.id]++;
+        score += g.pts;
+        spawnPtcl(c.x, c.y, g.color, 12);
+        // Effect
+        if (g.effect === "life" && lives < 5) {
+          lives++;
+          sfx.gem();
+          showRare("❤️ +1 HEART!", g.color);
+        } else if (g.effect === "immuno") {
+          immunoTimer = 300;
+          sfx.immuno();
+          showRare("🔮 IMMUNITY! 5 SECS!", g.color);
+        } else if (g.id === "star") {
+          sfx.rare();
+          showRare("⭐ LUCKY STAR! +200", g.color);
+        } else if (g.id === "diamond") {
+          sfx.rare();
+          showRare("💠 DIAMOND! +300 (ULTRA RARE!)", g.color);
+        } else if (g.id === "clover") {
+          speedBoost = 120;
+          sfx.rare();
+          showRare("🍀 SPEED BOOST!", g.color);
+        } else if (g.rarity < 0.05) sfx.gem();
+        else sfx.banana();
+        updateHUD();
+      }
+
+      function showRare(txt, col) {
+        const rb = document.getElementById("rare-banner");
+        rb.textContent = txt;
+        rb.style.borderColor = col || "#ffd166";
+        rb.classList.remove("pop");
+        void rb.offsetWidth;
+        rb.classList.add("pop");
+      }
+
+      function takeDmg(obs) {
         lives--;
-        hitCooldown = devMode ? 20 : 90;
-        spawnParticles(
-          punch.x + punch.w / 2,
-          punch.y - punch.h / 2,
-          "#ff4d6d",
-          20,
-        );
-        sfxHit();
-        setTimeout(sfxMonkeyCry, 200);
-        updateHeartsDisplay();
-        if (lives <= 0) triggerGameOver();
+        hitCD = devMode ? 15 : 80;
+        spawnPtcl(P.x + P.w / 2, P.y - P.h / 2, "#ff4d6d", 20);
+        sfx.hit();
+        updateHUD();
+        if (lives <= 0) triggerGameOver(obs);
       }
 
-      function updateHeartsDisplay() {
-        let h = "";
-        for (let i = 0; i < lives; i++) h += "❤️";
-        for (let i = lives; i < maxLives; i++) h += "🖤";
-        document.getElementById("hearts-display").textContent = h || "💀";
+      // ── LEVEL COMPLETE ──
+      function triggerLevelComplete() {
+        gameState = "transition";
+        stopMusic();
+        saveBest();
+        if (level >= 10) {
+          triggerWin();
+          return;
+        }
+        sfx.lvlup();
+        setTimeout(() => initLevel(level + 1), 400);
       }
 
-      function updateScoreDisplay() {
-        document.getElementById("score-display").textContent = score;
+      // ── GAME OVER ──
+      function triggerGameOver(obs) {
+        gameState = "over";
+        stopMusic();
+        saveBest();
+        sfx.death();
+        const f = FAILS[Math.floor(Math.random() * FAILS.length)];
+        document.getElementById("fail-title").textContent = f.title;
+        document.getElementById("fail-title").style.color = f.col;
+        document.getElementById("fail-msg").textContent = obs
+          ? `Killed by ${obs.villain.name}. ${f.msg}`
+          : f.msg;
+        document.getElementById("go-sc").textContent = score;
+        document.getElementById("go-lv").textContent = level;
+        document.getElementById("go-best").textContent = bestScore;
+        document.getElementById("go-maxlv").textContent = bestLevel;
+        document.getElementById("go-gems").textContent =
+          `Gems collected: ${gemsCollected} of ${gemsTotal}`;
+        const canCont = lives > 0;
+        document.getElementById("cont-btn").style.display = canCont
+          ? ""
+          : "none";
+        document.getElementById("continue-info").textContent = canCont
+          ? `${lives} heart${lives > 1 ? "s" : ""} remaining — continue from Level ${level}?`
+          : "No hearts left. Start fresh!";
+        showHUD(false);
+        startMusic("end");
+        showScr("scr-over");
       }
 
-      function updateLevelDisplay() {
-        document.getElementById("level-display").textContent = "LVL " + level;
+      function continueRun() {
+        if (lives <= 0) {
+          restartGame();
+          return;
+        }
+        showHUD(true);
+        obstacles = [];
+        collectibles = [];
+        obsBeaten = 0;
+        hitCD = 0;
+        initP();
+        showLevelToast(level, () => {
+          gameState = "playing";
+          startMusic("game");
+          cancelAnimationFrame(animID);
+          loop();
+        });
+      }
+      function restartGame() {
+        cancelAnimationFrame(animID);
+        startGame();
       }
 
-      // ---- DRAW ----
-      const BG_THEMES = {
-        zoo: {
-          sky: ["#1a3a4a", "#0d1f2d"],
-          ground: ["#4a3a1a", "#2a1a0a"],
-          accent: "#8b5e3c",
-          fog: null,
-        },
-        bamboo: {
-          sky: ["#0d2e1a", "#071a0d"],
-          ground: ["#2a4a1a", "#1a2a0a"],
-          accent: "#4a7a3a",
-          fog: "#0d2e1a",
-        },
-        river: {
-          sky: ["#0d1a3a", "#071022"],
-          ground: ["#1a3a4a", "#0a1a2a"],
-          accent: "#3a6a8a",
-          fog: "#0d1a3a",
-        },
-        jungle: {
-          sky: ["#0a2a1a", "#051510"],
-          ground: ["#1a3a0a", "#0a1a05"],
-          accent: "#2a5a1a",
-          fog: "#0a2a1a",
-        },
-        ruins: {
-          sky: ["#2a1a0a", "#1a0a05"],
-          ground: ["#3a2a1a", "#1a1a0a"],
-          accent: "#7a6a4a",
-          fog: null,
-        },
-        mushroom: {
-          sky: ["#2a0a2a", "#1a051a"],
-          ground: ["#3a1a3a", "#1a0a1a"],
-          accent: "#8a3a8a",
-          fog: "#1a051a",
-        },
-        cave: {
-          sky: ["#0a0a1a", "#050510"],
-          ground: ["#1a1a2a", "#0a0a1a"],
-          accent: "#3a3a6a",
-          fog: "#0a0a1a",
-        },
-        volcano: {
-          sky: ["#2a0a00", "#1a0500"],
-          ground: ["#3a1a0a", "#1a0a05"],
-          accent: "#ff4a00",
-          fog: "#1a0500",
-        },
-        moon: {
-          sky: ["#0a0a2a", "#05051a"],
-          ground: ["#1a1a3a", "#0a0a1a"],
-          accent: "#4a4a8a",
-          fog: null,
-        },
-        sky: {
-          sky: ["#1a3a6a", "#0d2244"],
-          ground: ["#2a4a8a", "#1a2a5a"],
-          accent: "#6a9adf",
-          fog: "#1a3a6a",
-        },
-        ghost: {
-          sky: ["#1a1a2a", "#0d0d1a"],
-          ground: ["#2a2a3a", "#1a1a2a"],
-          accent: "#8a8aba",
-          fog: "#0d0d1a",
-        },
-        candy: {
-          sky: ["#2a0a2a", "#1a051a"],
-          ground: ["#4a1a3a", "#2a0a1a"],
-          accent: "#ff6abf",
-          fog: null,
-        },
-        desert: {
-          sky: ["#3a2a0a", "#2a1a05"],
-          ground: ["#5a3a0a", "#3a2a0a"],
-          accent: "#cfaa5a",
-          fog: "#2a1a05",
-        },
-        ice: {
-          sky: ["#0a1a3a", "#05101a"],
-          ground: ["#1a2a4a", "#0a1a2a"],
-          accent: "#8acfef",
-          fog: "#0a1a3a",
-        },
-        space: {
-          sky: ["#000005", "#000010"],
-          ground: ["#0a0a1a", "#050510"],
-          accent: "#3a5a8a",
-          fog: null,
-        },
-        lava: {
-          sky: ["#1a0500", "#0d0200"],
-          ground: ["#2a0a00", "#1a0500"],
-          accent: "#ff2200",
-          fog: "#0d0200",
-        },
-        storm: {
-          sky: ["#0a0a0a", "#050505"],
-          ground: ["#1a1a0a", "#0a0a05"],
-          accent: "#dfdf00",
-          fog: "#0a0a0a",
-        },
-        dark: {
-          sky: ["#000000", "#050505"],
-          ground: ["#0a0a0a", "#050505"],
-          accent: "#1a1a2a",
-          fog: "#000000",
-        },
-        golden: {
-          sky: ["#2a1a00", "#1a0f00"],
-          ground: ["#3a2a00", "#2a1500"],
-          accent: "#ffd700",
-          fog: null,
-        },
-        final: {
-          sky: ["#1a0a2e", "#0d0420"],
-          ground: ["#2d1b69", "#1a0a3e"],
-          accent: "#ff6b35",
-          fog: null,
-        },
-      };
+      // ── WIN ──
+      function triggerWin() {
+        gameState = "won";
+        stopMusic();
+        saveBest();
+        sfx.win();
+        const elapsed = Math.round((Date.now() - startTime) / 1000);
+        document.getElementById("win-sc").textContent = score;
+        document.getElementById("win-time").textContent = elapsed + "s";
+        document.getElementById("win-gems").textContent = gemsCollected;
+        showHUD(false);
+        setTimeout(() => {
+          startMusic("end");
+          showScr("scr-win");
+          setTimeout(drawWinScene, 100);
+        }, 600);
+      }
 
+      // ── SHARE ──
+      function doShare(ctx) {
+        let txt;
+        if (ctx === "win") {
+          txt = `🧸 I BEAT PUNCH'S GREAT ESCAPE!\n10 levels, ${score} pts, ${gemsCollected} gems collected!\n\nThe plushie is finally back 💛\n\nPlay: #PunchMonkey #PunchEscape\nhttps://punch-monkey.vercel.app`;
+        } else {
+          txt = `🐒 Playing Punch's Great Escape!\nGot to Level ${level}, scored ${score} pts!\nBest level: ${bestLevel}\n\nCan you beat me? #PunchMonkey\nhttps://punch-monkey.vercel.app`;
+        }
+        if (navigator.share) {
+          navigator
+            .share({ title: "Punch's Great Escape", text: txt })
+            .catch(() => {});
+        } else {
+          try {
+            navigator.clipboard.writeText(txt);
+            alert("Copied! Paste & share 🐒\n\n" + txt);
+          } catch (e) {
+            alert(txt);
+          }
+        }
+      }
+
+      // ── RENDER ──
       function drawBg() {
-        const lc = LEVELS[Math.min(level - 1, LEVELS.length - 1)];
-        const theme = BG_THEMES[lc.bg] || BG_THEMES.zoo;
+        const lc = LEVELS[level - 1];
+        const th = BGTM[lc.bg] || BGTM.zoo;
+        // Sky
+        const g = cx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, th.sky[0]);
+        g.addColorStop(1, th.sky[1]);
+        cx.fillStyle = g;
+        cx.fillRect(0, 0, W, H);
 
-        // Sky gradient
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, theme.sky[0]);
-        g.addColorStop(1, theme.sky[1]);
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-
-        // Stars for dark levels
-        ctx.fillStyle = "rgba(255,255,255,0.6)";
-        const starSeed = level * 37;
-        for (let i = 0; i < 20; i++) {
-          const sx = (i * 137 + starSeed) % W;
-          const sy = (i * 79 + 23) % (H * 0.65);
-          const sr = i % 3 === 0 ? 1.5 : 0.8;
-          ctx.beginPath();
-          ctx.arc(sx, sy, sr * GC_RATIO, 0, Math.PI * 2);
-          ctx.fill();
+        // Stars
+        cx.fillStyle = "rgba(255,255,255,.55)";
+        for (let i = 0; i < 22; i++) {
+          cx.beginPath();
+          cx.arc(
+            (i * 137 + level * 19) % W,
+            (i * 79 + 23) % (H * 0.65),
+            (i % 3 === 0 ? 1.4 : 0.75) * S,
+            0,
+            Math.PI * 2,
+          );
+          cx.fill();
         }
 
         // Moon/sun
-        if (["moon", "cave", "ghost", "space", "dark"].includes(lc.bg)) {
-          ctx.fillStyle = "#ffd166";
-          ctx.shadowColor = "#ffd16666";
-          ctx.shadowBlur = 15 * GC_RATIO;
-          ctx.beginPath();
-          ctx.arc(W * 0.85, H * 0.15, 20 * GC_RATIO, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        } else if (["lava", "volcano", "final"].includes(lc.bg)) {
-          const rg = ctx.createRadialGradient(
-            W * 0.85,
-            H * 0.12,
-            0,
-            W * 0.85,
-            H * 0.12,
-            30 * GC_RATIO,
-          );
-          rg.addColorStop(0, "#ffcc00");
-          rg.addColorStop(1, "rgba(255,100,0,0)");
-          ctx.fillStyle = rg;
-          ctx.fillRect(W * 0.7, 0, W * 0.3, H * 0.3);
+        if (["cave", "moon", "final"].includes(lc.bg)) {
+          cx.fillStyle = "#ffd166";
+          cx.shadowColor = "#ffd16666";
+          cx.shadowBlur = 18 * S;
+          cx.beginPath();
+          cx.arc(W * 0.83, H * 0.14, 22 * S, 0, Math.PI * 2);
+          cx.fill();
+          cx.shadowBlur = 0;
         }
 
-        // Level-specific BG elements
-        drawLevelBgElements(lc.bg, theme);
+        // Level-specific atmosphere
+        drawAtmo(lc.bg, th);
 
-        // Parallax trees/structures
-        drawParallaxLayer(1, theme.sky[0], 0.7, lc.bg);
-        drawParallaxLayer(0.8, "rgba(0,0,0,0.5)", 0.55, lc.bg);
+        // Far trees (parallax layer 1)
+        cx.fillStyle = th.sky[0] + "cc";
+        cx.globalAlpha = 0.65;
+        for (let i = 0; i < 7; i++) {
+          const tx = (((i / 7) * W * 1.3 + bgX[1] * 0.4) % (W * 1.5)) - W * 0.1;
+          const th2 = H * (0.45 + (i % 3) * 0.1);
+          drawTree(tx, GR, th2, lc.bg);
+        }
+        // Near trees (layer 2)
+        cx.fillStyle = "rgba(0,0,0,.55)";
+        for (let i = 0; i < 5; i++) {
+          const tx = (((i / 5) * W * 1.2 + bgX[2] * 0.7) % (W * 1.3)) - W * 0.1;
+          const th2 = H * (0.28 + (i % 2) * 0.08);
+          drawTree(tx, GR, th2, lc.bg);
+        }
+        cx.globalAlpha = 1;
 
         // Ground
-        const gg = ctx.createLinearGradient(0, GROUND, 0, H);
-        gg.addColorStop(0, theme.ground[0]);
-        gg.addColorStop(1, theme.ground[1]);
-        ctx.fillStyle = gg;
-        ctx.fillRect(0, GROUND, W, H - GROUND);
-
-        // Ground line
-        ctx.strokeStyle = theme.accent;
-        ctx.lineWidth = 2 * GC_RATIO;
-        ctx.beginPath();
-        ctx.moveTo(0, GROUND);
-        ctx.lineTo(W, GROUND);
-        ctx.stroke();
-
-        // Ground detail marks
-        ctx.strokeStyle = theme.accent + "44";
-        ctx.lineWidth = GC_RATIO;
-        const mk = 80 * GC_RATIO;
-        const off = (frame * speed * 0.5) % mk;
+        const gg = cx.createLinearGradient(0, GR, 0, H);
+        gg.addColorStop(0, th.gnd[0]);
+        gg.addColorStop(1, th.gnd[1]);
+        cx.fillStyle = gg;
+        cx.fillRect(0, GR, W, H - GR);
+        cx.strokeStyle = th.acc;
+        cx.lineWidth = 2 * S;
+        cx.beginPath();
+        cx.moveTo(0, GR);
+        cx.lineTo(W, GR);
+        cx.stroke();
+        // Ground marks
+        cx.strokeStyle = th.acc + "44";
+        cx.lineWidth = S;
+        const mk = 80 * S,
+          off = (frame * speed * 0.4) % mk;
         for (let x = -off; x < W; x += mk) {
-          ctx.beginPath();
-          ctx.moveTo(x, GROUND + 8 * GC_RATIO);
-          ctx.lineTo(x + 25 * GC_RATIO, GROUND + 8 * GC_RATIO);
-          ctx.stroke();
+          cx.beginPath();
+          cx.moveTo(x, GR + 8 * S);
+          cx.lineTo(x + 22 * S, GR + 8 * S);
+          cx.stroke();
         }
 
-        // Fog overlay for certain levels
-        if (theme.fog) {
-          const fog = ctx.createLinearGradient(0, H * 0.6, 0, H);
-          fog.addColorStop(0, "transparent");
-          fog.addColorStop(1, theme.fog + "aa");
-          ctx.fillStyle = fog;
-          ctx.fillRect(0, H * 0.6, W, H * 0.4);
-        }
-
-        // Level name watermark
-        ctx.globalAlpha = 0.06;
-        ctx.fillStyle = "white";
-        ctx.font = `bold ${Math.round(28 * GC_RATIO)}px Boogaloo`;
-        ctx.textAlign = "center";
-        ctx.fillText(lc.emoji + " " + lc.name.toUpperCase(), W / 2, H * 0.55);
-        ctx.globalAlpha = 1;
+        // Level watermark
+        cx.globalAlpha = 0.05;
+        cx.fillStyle = "white";
+        cx.font = `bold ${28 * S}px Boogaloo`;
+        cx.textAlign = "center";
+        cx.fillText(lc.emoji + " " + lc.name.toUpperCase(), W / 2, H * 0.55);
+        cx.globalAlpha = 1;
       }
 
-      function drawLevelBgElements(bg, theme) {
-        const w20 = W * 0.2,
-          gr = GROUND;
-        switch (bg) {
-          case "zoo":
-            // Bars / cage vibes
-            ctx.strokeStyle = "rgba(100,80,50,0.25)";
-            ctx.lineWidth = 4 * GC_RATIO;
-            for (let x = W * 0.1; x < W; x += W * 0.12) {
-              ctx.beginPath();
-              ctx.moveTo(x, 0);
-              ctx.lineTo(x, gr);
-              ctx.stroke();
-            }
-            break;
-          case "bamboo":
-            ctx.strokeStyle = "rgba(60,120,40,0.3)";
-            ctx.lineWidth = 6 * GC_RATIO;
-            for (let x = W * 0.05; x < W; x += W * 0.08) {
-              ctx.beginPath();
-              ctx.moveTo(
-                x + Math.sin(bgOffset[0] * 0.02 + x) * 5 * GC_RATIO,
-                0,
-              );
-              ctx.lineTo(x, gr);
-              ctx.stroke();
-            }
-            break;
-          case "river":
-            // Water ripples
-            ctx.strokeStyle = "rgba(60,120,200,0.2)";
-            ctx.lineWidth = 2 * GC_RATIO;
-            for (let y = gr + 10 * GC_RATIO; y < H; y += 12 * GC_RATIO) {
-              ctx.beginPath();
-              ctx.moveTo(0, y);
-              for (let x = 0; x < W; x += 20 * GC_RATIO) {
-                ctx.lineTo(
-                  x,
-                  y + Math.sin((x + bgOffset[2]) * 0.05) * 4 * GC_RATIO,
-                );
-              }
-              ctx.stroke();
-            }
-            break;
-          case "lava":
-          case "volcano":
-            // Lava glow
-            const lg = ctx.createLinearGradient(0, gr, 0, H);
-            lg.addColorStop(0, "rgba(255,50,0,0.3)");
-            lg.addColorStop(1, "rgba(255,0,0,0.1)");
-            ctx.fillStyle = lg;
-            ctx.fillRect(0, gr, W, H - gr);
-            break;
-          case "space":
-            // Star field
-            ctx.fillStyle = "white";
-            for (let i = 0; i < 40; i++) {
-              const sx = (i * 97 + bgOffset[1]) % W;
-              const sy = (i * 53 + 11) % H;
-              ctx.beginPath();
-              ctx.arc(sx, sy, 0.8 * GC_RATIO, 0, Math.PI * 2);
-              ctx.fill();
-            }
-            break;
-          case "candy":
-            // Candy stripes faint
-            ctx.strokeStyle = "rgba(255,100,180,0.1)";
-            ctx.lineWidth = 15 * GC_RATIO;
-            for (
-              let x = -W + bgOffset[2] * 0.5;
-              x < W * 2;
-              x += 60 * GC_RATIO
-            ) {
-              ctx.beginPath();
-              ctx.moveTo(x, 0);
-              ctx.lineTo(x + 80 * GC_RATIO, H);
-              ctx.stroke();
-            }
-            break;
-          case "ice":
-            // Ice crystals on ground
-            ctx.strokeStyle = "rgba(150,220,255,0.3)";
-            ctx.lineWidth = GC_RATIO;
-            for (let x = 0; x < W; x += 40 * GC_RATIO) {
-              const ix = (x + bgOffset[3] * 0.3) % W;
-              ctx.beginPath();
-              ctx.moveTo(ix, gr);
-              ctx.lineTo(ix + 8 * GC_RATIO, gr - 20 * GC_RATIO);
-              ctx.moveTo(ix, gr);
-              ctx.lineTo(ix - 8 * GC_RATIO, gr - 18 * GC_RATIO);
-              ctx.stroke();
-            }
-            break;
-          case "final":
-            // Plushie glow on horizon
-            const pg = ctx.createRadialGradient(
-              W * 0.5,
-              GROUND,
-              0,
-              W * 0.5,
-              GROUND,
-              W * 0.4,
-            );
-            pg.addColorStop(0, "rgba(255,77,109,0.2)");
-            pg.addColorStop(1, "transparent");
-            ctx.fillStyle = pg;
-            ctx.fillRect(0, H * 0.3, W, H * 0.7);
-            break;
+      function drawAtmo(bg, th) {
+        if (bg === "volcano" || bg === "storm") {
+          cx.fillStyle = "rgba(255,50,0,.08)";
+          cx.fillRect(0, 0, W, H);
         }
-      }
-
-      function drawParallaxLayer(opacity, color, heightFrac, bg) {
-        // Draw trees / structures appropriate to bg
-        const count = 6;
-        const treeH = H * heightFrac;
-        ctx.fillStyle = color;
-        ctx.globalAlpha = opacity * 0.6;
-
-        for (let i = 0; i < count; i++) {
-          const base =
-            (((i / count) * W * 1.4 + bgOffset[1] * 0.4) % (W * 1.5)) - W * 0.1;
-          const h = treeH * (0.7 + (i % 3) * 0.2);
-
-          if (["ruins", "cave", "ghost"].includes(bg)) {
-            // Pillar
-            ctx.fillRect(base - 8 * GC_RATIO, GROUND - h, 16 * GC_RATIO, h);
-            ctx.fillRect(
-              base - 14 * GC_RATIO,
-              GROUND - h,
-              28 * GC_RATIO,
-              8 * GC_RATIO,
-            );
-          } else if (["space", "dark"].includes(bg)) {
-            // Weird geometric
-            ctx.beginPath();
-            ctx.moveTo(base, GROUND);
-            ctx.lineTo(base - 12 * GC_RATIO, GROUND - h);
-            ctx.lineTo(base + 12 * GC_RATIO, GROUND - h);
-            ctx.fill();
-          } else {
-            // Tree
-            ctx.fillRect(
-              base - 5 * GC_RATIO,
-              GROUND - h * 0.45,
-              10 * GC_RATIO,
-              h * 0.45,
-            );
-            ctx.beginPath();
-            ctx.arc(base, GROUND - h * 0.55, h * 0.38, 0, Math.PI * 2);
-            ctx.fill();
-            if (["bamboo", "jungle"].includes(bg)) {
-              // extra foliage
-              ctx.beginPath();
-              ctx.arc(
-                base - 15 * GC_RATIO,
-                GROUND - h * 0.4,
-                h * 0.25,
-                0,
-                Math.PI * 2,
-              );
-              ctx.arc(
-                base + 15 * GC_RATIO,
-                GROUND - h * 0.45,
-                h * 0.22,
-                0,
-                Math.PI * 2,
-              );
-              ctx.fill();
-            }
+        if (bg === "bamboo") {
+          cx.strokeStyle = "rgba(60,120,40,.2)";
+          cx.lineWidth = 5 * S;
+          for (let x = W * 0.05; x < W; x += W * 0.09) {
+            cx.beginPath();
+            cx.moveTo(x + Math.sin(bgX[0] * 0.02 + x) * 0.008 * W, 0);
+            cx.lineTo(x, GR);
+            cx.stroke();
           }
         }
-        ctx.globalAlpha = 1;
+        if (bg === "cave") {
+          cx.fillStyle = "rgba(0,0,0,.3)";
+          cx.fillRect(0, 0, W, H);
+        }
+        if (bg === "final") {
+          const pg = cx.createRadialGradient(
+            W * 0.5,
+            GR,
+            0,
+            W * 0.5,
+            GR,
+            W * 0.45,
+          );
+          pg.addColorStop(0, "rgba(255,77,109,.18)");
+          pg.addColorStop(1, "transparent");
+          cx.fillStyle = pg;
+          cx.fillRect(0, H * 0.25, W, H * 0.75);
+          // Plushie silhouette hint on horizon
+          cx.globalAlpha = 0.12;
+          cx.fillStyle = "#ff4d6d";
+          cx.beginPath();
+          cx.arc(W * 0.5, GR - 60 * S, 35 * S, Math.PI, 0);
+          cx.fill();
+          cx.globalAlpha = 1;
+        }
       }
 
-      function drawPunch() {
-        const x = punch.x;
-        const y = punch.y;
-        const s = GC_RATIO;
-        const bob = punch.jumping ? 0 : Math.sin(frame * 0.28) * 2 * s;
-        const flash = hitCooldown > 0 && Math.floor(hitCooldown / 5) % 2 === 0;
+      function drawTree(x, baseY, h, bg) {
+        if (["ruins", "cave"].includes(bg)) {
+          cx.fillRect(x - 8 * S, baseY - h, 16 * S, h);
+          cx.fillRect(x - 14 * S, baseY - h, 28 * S, 7 * S);
+        } else if (bg === "mushroom") {
+          cx.fillRect(x - 4 * S, baseY - h * 0.45, 8 * S, h * 0.45);
+          cx.beginPath();
+          cx.arc(x, baseY - h * 0.55, h * 0.42, 0, Math.PI * 2);
+          cx.fill();
+          cx.fillStyle = "rgba(255,100,200,.3)";
+          cx.beginPath();
+          cx.arc(x, baseY - h * 0.55, h * 0.45, 0, Math.PI * 2);
+          cx.fill();
+        } else {
+          cx.fillRect(x - 5 * S, baseY - h * 0.45, 10 * S, h * 0.45);
+          cx.beginPath();
+          cx.arc(x, baseY - h * 0.55, h * 0.38, 0, Math.PI * 2);
+          cx.fill();
+        }
+      }
 
-        ctx.save();
-        ctx.translate(x + punch.w / 2, y + bob);
-        if (punch.sliding) ctx.scale(1, 0.55);
-        if (flash) ctx.globalAlpha = 0.25;
+      // ── DRAW PUNCH ──
+      function drawPunch() {
+        const x = P.x,
+          y = P.y,
+          s = S;
+        const bob = P.jumping ? 0 : Math.sin(frame * 0.28) * 2 * s;
+        const flash = hitCD > 0 && Math.floor(hitCD / 5) % 2 === 0;
+        const immGlow = immunoTimer > 0;
+
+        cx.save();
+        cx.translate(x + P.w / 2, y + bob);
+        if (P.sliding) cx.scale(1, 0.55);
+        if (flash) cx.globalAlpha = 0.22;
+
+        // Immunity glow
+        if (immGlow) {
+          cx.shadowColor = "#c084fc";
+          cx.shadowBlur = 18 * s;
+        }
 
         // Shadow
-        ctx.globalAlpha = flash ? 0.05 : 0.25;
-        ctx.fillStyle = "#000";
-        ctx.beginPath();
-        ctx.ellipse(0, 2 * s, 22 * s, 7 * s, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = flash ? 0.25 : 1;
+        cx.globalAlpha = flash ? 0.05 : immGlow ? 0.5 : 0.22;
+        cx.fillStyle = immGlow ? "#c084fc" : "#000";
+        cx.beginPath();
+        cx.ellipse(0, 3 * s, 22 * s, 7 * s, 0, 0, Math.PI * 2);
+        cx.fill();
+        cx.globalAlpha = flash ? 0.22 : 1;
 
         // Body
-        ctx.fillStyle = "#c47a2e";
-        ctx.beginPath();
-        ctx.roundRect(-16 * s, -44 * s, 32 * s, 36 * s, 8 * s);
-        ctx.fill();
-
+        cx.fillStyle = immGlow ? "#d8a0ff" : "#c47a2e";
+        cx.shadowBlur = 0;
+        cx.beginPath();
+        cx.roundRect(-16 * s, -44 * s, 32 * s, 36 * s, 8 * s);
+        cx.fill();
         // Belly
-        ctx.fillStyle = "#e8a96a";
-        ctx.beginPath();
-        ctx.ellipse(0, -30 * s, 10 * s, 12 * s, 0, 0, Math.PI * 2);
-        ctx.fill();
-
+        cx.fillStyle = immGlow ? "#f0d0ff" : "#e8a96a";
+        cx.beginPath();
+        cx.ellipse(0, -30 * s, 10 * s, 12 * s, 0, 0, Math.PI * 2);
+        cx.fill();
         // Head
-        ctx.fillStyle = "#c47a2e";
-        ctx.beginPath();
-        ctx.arc(0, -52 * s, 17 * s, 0, Math.PI * 2);
-        ctx.fill();
-
+        cx.fillStyle = immGlow ? "#d8a0ff" : "#c47a2e";
+        cx.beginPath();
+        cx.arc(0, -52 * s, 17 * s, 0, Math.PI * 2);
+        cx.fill();
         // Face
-        ctx.fillStyle = "#e8a96a";
-        ctx.beginPath();
-        ctx.ellipse(0, -48 * s, 12 * s, 11 * s, 0, 0, Math.PI * 2);
-        ctx.fill();
-
+        cx.fillStyle = immGlow ? "#f0d0ff" : "#e8a96a";
+        cx.beginPath();
+        cx.ellipse(0, -48 * s, 12 * s, 11 * s, 0, 0, Math.PI * 2);
+        cx.fill();
         // Eyes
-        ctx.fillStyle = "#1a0a2e";
-        ctx.beginPath();
-        ctx.arc(-6 * s, -54 * s, 3.5 * s, 0, Math.PI * 2);
-        ctx.arc(6 * s, -54 * s, 3.5 * s, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = "white";
-        ctx.beginPath();
-        ctx.arc(-5 * s, -55 * s, 1.2 * s, 0, Math.PI * 2);
-        ctx.arc(7 * s, -55 * s, 1.2 * s, 0, Math.PI * 2);
-        ctx.fill();
-
+        cx.fillStyle = "#1a0a2e";
+        cx.beginPath();
+        cx.arc(-6 * s, -54 * s, 3.5 * s, 0, Math.PI * 2);
+        cx.arc(6 * s, -54 * s, 3.5 * s, 0, Math.PI * 2);
+        cx.fill();
+        cx.fillStyle = "white";
+        cx.beginPath();
+        cx.arc(-5 * s, -55 * s, 1.2 * s, 0, Math.PI * 2);
+        cx.arc(7 * s, -55 * s, 1.2 * s, 0, Math.PI * 2);
+        cx.fill();
         // Smile
-        ctx.strokeStyle = "#1a0a2e";
-        ctx.lineWidth = 2 * s;
-        ctx.beginPath();
-        ctx.arc(0, -44 * s, 5 * s, 0.2, Math.PI - 0.2);
-        ctx.stroke();
-
+        cx.strokeStyle = "#1a0a2e";
+        cx.lineWidth = 2 * s;
+        cx.beginPath();
+        cx.arc(0, -44 * s, 5 * s, 0.2, Math.PI - 0.2);
+        cx.stroke();
         // Ears
-        ctx.fillStyle = "#c47a2e";
-        ctx.beginPath();
-        ctx.arc(-16 * s, -55 * s, 7 * s, 0, Math.PI * 2);
-        ctx.arc(16 * s, -55 * s, 7 * s, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#e8c09a";
-        ctx.beginPath();
-        ctx.arc(-16 * s, -55 * s, 4 * s, 0, Math.PI * 2);
-        ctx.arc(16 * s, -55 * s, 4 * s, 0, Math.PI * 2);
-        ctx.fill();
+        cx.fillStyle = immGlow ? "#d8a0ff" : "#c47a2e";
+        cx.beginPath();
+        cx.arc(-16 * s, -55 * s, 7 * s, 0, Math.PI * 2);
+        cx.arc(16 * s, -55 * s, 7 * s, 0, Math.PI * 2);
+        cx.fill();
+        cx.fillStyle = immGlow ? "#f0d0ff" : "#e8c09a";
+        cx.beginPath();
+        cx.arc(-16 * s, -55 * s, 4 * s, 0, Math.PI * 2);
+        cx.arc(16 * s, -55 * s, 4 * s, 0, Math.PI * 2);
+        cx.fill();
+        // RED PLUSHIE cradled
+        cx.fillStyle = "#ff4d6d";
+        cx.shadowColor = "#ff4d6d44";
+        cx.shadowBlur = 8 * s;
+        cx.beginPath();
+        cx.arc(-20 * s, -30 * s, 10 * s, 0, Math.PI * 2);
+        cx.fill();
+        cx.shadowBlur = 0;
+        cx.fillStyle = "#ff8fa3";
+        cx.beginPath();
+        cx.ellipse(-20 * s, -27 * s, 7 * s, 6 * s, 0, 0, Math.PI * 2);
+        cx.fill();
+        cx.fillStyle = "#ff4d6d";
+        cx.beginPath();
+        cx.arc(-27 * s, -38 * s, 4 * s, 0, Math.PI * 2);
+        cx.arc(-14 * s, -39 * s, 4 * s, 0, Math.PI * 2);
+        cx.fill();
+        cx.fillStyle = "#1a0a2e";
+        cx.beginPath();
+        cx.arc(-22 * s, -29 * s, 1.5 * s, 0, Math.PI * 2);
+        cx.arc(-17 * s, -29 * s, 1.5 * s, 0, Math.PI * 2);
+        cx.fill();
+        // Legs
+        const leg = P.jumping ? 8 * s : Math.sin(frame * 0.38) * 13 * s;
+        cx.fillStyle = immGlow ? "#d8a0ff" : "#c47a2e";
+        cx.save();
+        cx.translate(-7 * s, -8 * s);
+        cx.rotate(leg * 0.04);
+        cx.beginPath();
+        cx.roundRect(-5 * s, 0, 10 * s, 14 * s, 4 * s);
+        cx.fill();
+        cx.fillStyle = "#9a5a1e";
+        cx.beginPath();
+        cx.ellipse(0, 15 * s, 8 * s, 5 * s, leg * 0.02, 0, Math.PI * 2);
+        cx.fill();
+        cx.restore();
+        cx.fillStyle = immGlow ? "#d8a0ff" : "#c47a2e";
+        cx.save();
+        cx.translate(7 * s, -8 * s);
+        cx.rotate(-leg * 0.04);
+        cx.beginPath();
+        cx.roundRect(-5 * s, 0, 10 * s, 14 * s, 4 * s);
+        cx.fill();
+        cx.fillStyle = "#9a5a1e";
+        cx.beginPath();
+        cx.ellipse(0, 15 * s, 8 * s, 5 * s, -leg * 0.02, 0, Math.PI * 2);
+        cx.fill();
+        cx.restore();
 
-        // RED PLUSHIE (cradled)
-        const pa = -20 * s,
-          py = -30 * s;
-        ctx.fillStyle = "#ff4d6d";
-        ctx.beginPath();
-        ctx.arc(pa, py, 10 * s, 0, Math.PI * 2);
-        ctx.fill();
-        // plushie face
-        ctx.fillStyle = "#ff8fa3";
-        ctx.beginPath();
-        ctx.ellipse(pa, py + 1 * s, 7 * s, 6 * s, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#ff4d6d";
-        ctx.beginPath();
-        ctx.arc(pa - 7 * s, py - 8 * s, 4 * s, 0, Math.PI * 2);
-        ctx.arc(pa + 3 * s, py - 9 * s, 4 * s, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#1a0a2e";
-        ctx.beginPath();
-        ctx.arc(pa - 2 * s, py - 1 * s, 1.5 * s, 0, Math.PI * 2);
-        ctx.arc(pa + 3 * s, py - 1 * s, 1.5 * s, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Legs / running animation
-        const legSwing = punch.jumping
-          ? 8 * s
-          : Math.sin(frame * 0.38) * 12 * s;
-        ctx.fillStyle = "#c47a2e";
-        // Leg 1
-        ctx.save();
-        ctx.translate(-7 * s, -8 * s);
-        ctx.rotate(legSwing * 0.04);
-        ctx.beginPath();
-        ctx.roundRect(-5 * s, 0, 10 * s, 14 * s, 4 * s);
-        ctx.fill();
-        ctx.fillStyle = "#9a5a1e";
-        ctx.beginPath();
-        ctx.ellipse(0, 15 * s, 8 * s, 5 * s, legSwing * 0.02, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-        // Leg 2
-        ctx.fillStyle = "#c47a2e";
-        ctx.save();
-        ctx.translate(7 * s, -8 * s);
-        ctx.rotate(-legSwing * 0.04);
-        ctx.beginPath();
-        ctx.roundRect(-5 * s, 0, 10 * s, 14 * s, 4 * s);
-        ctx.fill();
-        ctx.fillStyle = "#9a5a1e";
-        ctx.beginPath();
-        ctx.ellipse(0, 15 * s, 8 * s, 5 * s, -legSwing * 0.02, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        ctx.restore();
-        ctx.globalAlpha = 1;
+        cx.restore();
+        cx.globalAlpha = 1;
       }
 
-      function drawObstacle(o) {
-        const s = GC_RATIO;
-        ctx.save();
-        ctx.translate(o.x + o.w / 2, 0);
+      // ── DRAW VILLAINS ──
+      function drawVillain(o) {
+        const s = S;
+        cx.save();
+        cx.translate(o.x + o.w / 2, 0);
+        const v = o.villain;
+        const bob = o.animF === 1 ? -4 * s : 0;
 
-        if (o.type === "vine") {
-          // Hanging vine from top
-          ctx.fillStyle = "#2d7a2d";
-          ctx.fillRect(-o.w / 2, 0, o.w, o.y);
-          // leaves along vine
+        // Label
+        cx.fillStyle = "rgba(255,255,255,.75)";
+        cx.font = `bold ${11 * s}px Boogaloo`;
+        cx.textAlign = "center";
+
+        if (o.type === "vine" || o.type === "swinger") {
+          const vy = o.y;
+          cx.fillStyle = "#2d7a2d";
+          cx.fillRect(-o.w / 2, 0, o.w, vy);
           for (let i = 0; i < 4; i++) {
-            const lx = (i % 2 === 0 ? 8 : -8) * s;
-            const ly = (i + 1) * (o.y / 5);
-            ctx.fillStyle = i % 2 === 0 ? "#3da03d" : "#2d7a2d";
-            ctx.beginPath();
-            ctx.ellipse(lx, ly, 10 * s, 16 * s, 0.4, 0, Math.PI * 2);
-            ctx.fill();
+            const lx = (i % 2 === 0 ? 9 : -9) * s,
+              ly = (i + 1) * (vy / 5);
+            cx.fillStyle = i % 2 === 0 ? "#3da03d" : "#2d7a2d";
+            cx.beginPath();
+            cx.ellipse(lx, ly, 10 * s, 16 * s, 0.4, 0, Math.PI * 2);
+            cx.fill();
           }
-          ctx.fillStyle = "rgba(255,255,255,0.7)";
-          ctx.font = `bold ${11 * s}px Boogaloo`;
-          ctx.textAlign = "center";
-          ctx.fillText("DUCK!", 0, o.y - 18 * s);
-        } else if (o.type === "stone") {
+          if (o.type === "swinger") {
+            // Monkey swinging
+            const sy = vy - 20 * s + Math.sin(frame * 0.1) * 8 * s;
+            cx.fillStyle = v.color;
+            cx.beginPath();
+            cx.arc(0, sy - 10 * s, 10 * s, 0, Math.PI * 2);
+            cx.fill();
+          }
+          cx.fillStyle = "rgba(255,255,255,.8)";
+          cx.fillText("DUCK!", 0, vy - 22 * s);
+        } else if (o.type === "stone" || o.type === "boulder") {
           const gy = o.y;
-          const bob = o.animFrame * 1 * s;
-          ctx.fillStyle = "#7a7a8a";
-          ctx.beginPath();
-          ctx.roundRect(
-            -o.w / 2 + 2 * s,
-            gy - o.h + bob,
-            o.w - 4 * s,
-            o.h,
-            6 * s,
-          );
-          ctx.fill();
-          ctx.fillStyle = "#9a9aaa";
-          ctx.beginPath();
-          ctx.ellipse(
+          cx.fillStyle = "#6b7280";
+          cx.beginPath();
+          cx.roundRect(-o.w / 2, gy - o.h + bob, o.w, o.h, 8 * s);
+          cx.fill();
+          cx.fillStyle = "#9ca3af";
+          cx.beginPath();
+          cx.ellipse(
             -6 * s,
             gy - o.h + o.h * 0.3 + bob,
-            6 * s,
+            7 * s,
             4 * s,
             -0.4,
             0,
             Math.PI * 2,
           );
-          ctx.fill();
-          ctx.fillStyle = "rgba(255,255,255,0.7)";
-          ctx.font = `bold ${11 * s}px Boogaloo`;
-          ctx.textAlign = "center";
-          ctx.fillText("JUMP!", 0, gy - o.h - 10 * s + bob);
-        } else if (o.type === "banana_peel") {
+          cx.fill();
+          // Angry face on stone
+          cx.fillStyle = "#1a0a2e";
+          cx.beginPath();
+          cx.arc(-5 * s, gy - o.h * 0.55 + bob, 3 * s, 0, Math.PI * 2);
+          cx.arc(5 * s, gy - o.h * 0.55 + bob, 3 * s, 0, Math.PI * 2);
+          cx.fill();
+          cx.strokeStyle = "#1a0a2e";
+          cx.lineWidth = 2 * s;
+          cx.beginPath();
+          cx.arc(0, gy - o.h * 0.35 + bob, 5 * s, 0, Math.PI);
+          cx.stroke();
+          cx.fillStyle = "rgba(255,255,255,.8)";
+          cx.fillText("JUMP!", 0, gy - o.h - 12 * s + bob);
+        } else if (o.type === "peel") {
           const gy = o.y;
-          ctx.fillStyle = "#ffd166";
-          ctx.beginPath();
-          ctx.ellipse(0, gy - 6 * s, 16 * s, 6 * s, 0.3, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#e6b800";
-          for (let i = -1; i <= 1; i++) {
-            ctx.beginPath();
-            ctx.moveTo(i * 8 * s, gy - 6 * s);
-            ctx.quadraticCurveTo(
-              i * 14 * s,
-              gy - 20 * s,
-              i * 6 * s,
-              gy - 24 * s,
+          cx.fillStyle = "#fdd835";
+          cx.beginPath();
+          cx.ellipse(0, gy - 5 * s, 18 * s, 7 * s, 0.3, 0, Math.PI * 2);
+          cx.fill();
+          cx.strokeStyle = "#e6b800";
+          cx.lineWidth = 2 * s;
+          [-1, 0, 1].forEach((d) => {
+            cx.beginPath();
+            cx.moveTo(d * 8 * s, gy - 5 * s);
+            cx.quadraticCurveTo(
+              d * 15 * s,
+              gy - 22 * s,
+              d * 6 * s,
+              gy - 26 * s,
             );
-            ctx.stroke();
-          }
-          ctx.fillStyle = "rgba(255,255,255,0.7)";
-          ctx.font = `bold ${10 * s}px Boogaloo`;
-          ctx.textAlign = "center";
-          ctx.fillText("🍌", 0, gy - 28 * s);
-        } else if (o.type === "slider") {
-          const gy = o.y + o.animFrame * 2 * s;
-          // Angry slider monkey - low
-          ctx.fillStyle = "#ef476f";
-          ctx.beginPath();
-          ctx.roundRect(-o.w / 2, gy - 20 * s, o.w, 20 * s, 6 * s);
-          ctx.fill();
-          // Head
-          ctx.fillStyle = "#ff7096";
-          ctx.beginPath();
-          ctx.arc(-o.w / 2 + 12 * s, gy - 28 * s, 13 * s, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#ffaaba";
-          ctx.beginPath();
-          ctx.ellipse(
-            -o.w / 2 + 12 * s,
-            gy - 24 * s,
-            9 * s,
-            8 * s,
-            0,
-            0,
-            Math.PI * 2,
-          );
-          ctx.fill();
-          // Angry eyes
-          ctx.fillStyle = "white";
-          ctx.beginPath();
-          ctx.arc(-o.w / 2 + 7 * s, gy - 30 * s, 4 * s, 0, Math.PI * 2);
-          ctx.arc(-o.w / 2 + 17 * s, gy - 30 * s, 4 * s, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#1a0a2e";
-          ctx.beginPath();
-          ctx.arc(-o.w / 2 + 8 * s, gy - 29 * s, 2.5 * s, 0, Math.PI * 2);
-          ctx.arc(-o.w / 2 + 18 * s, gy - 29 * s, 2.5 * s, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = "#1a0a2e";
-          ctx.lineWidth = 2.5 * s;
-          ctx.beginPath();
-          ctx.moveTo(-o.w / 2 + 4 * s, gy - 35 * s);
-          ctx.lineTo(-o.w / 2 + 12 * s, gy - 32 * s);
-          ctx.moveTo(-o.w / 2 + 13 * s, gy - 35 * s);
-          ctx.lineTo(-o.w / 2 + 20 * s, gy - 32 * s);
-          ctx.stroke();
-          ctx.fillStyle = "rgba(255,255,255,0.8)";
-          ctx.font = `bold ${11 * s}px Boogaloo`;
-          ctx.textAlign = "center";
-          ctx.fillText("JUMP!", 0, gy - 44 * s);
-        } else {
-          // jumper
+            cx.stroke();
+          });
+          cx.fillStyle = "rgba(255,255,255,.8)";
+          cx.fillText("🍌", 0, gy - 30 * s);
+        } else if (o.type === "spike") {
           const gy = o.y;
-          const bob = o.animFrame === 1 ? -5 * s : 0;
-          ctx.fillStyle = "#ff9f1c";
-          ctx.beginPath();
-          ctx.roundRect(-o.w / 2, gy - o.h + bob, o.w, o.h * 0.7, 8 * s);
-          ctx.fill();
+          for (let i = -1; i <= 1; i++) {
+            cx.fillStyle = v.color;
+            cx.beginPath();
+            cx.moveTo(i * 16 * s + (o.w / 2) * i * 0.3, gy);
+            cx.lineTo(i * 16 * s - 6 * s + (o.w / 2) * i * 0.3, gy - o.h);
+            cx.lineTo(i * 16 * s + 6 * s + (o.w / 2) * i * 0.3, gy - o.h);
+            cx.fill();
+          }
+          cx.fillStyle = "rgba(255,255,255,.8)";
+          cx.fillText("HIGH!", 0, gy - o.h - 14 * s);
+        } else {
+          // Default: monkey figure
+          const gy = o.y;
+          const isSlider = o.type === "slider";
+          const isBig = o.type === "bigbobo";
+          const scale = isBig ? 1.35 : 1;
+
+          cx.save();
+          if (isSlider) {
+            cx.scale(1, 0.7);
+            cx.translate(0, -5 * s);
+          }
+
+          cx.fillStyle = v.color;
+          // Body
+          cx.beginPath();
+          cx.roundRect(
+            (-o.w / 2) * scale,
+            gy - o.h * scale + bob,
+            o.w * scale,
+            o.h * 0.65 * scale,
+            7 * s,
+          );
+          cx.fill();
           // Head
-          ctx.beginPath();
-          ctx.arc(0, gy - o.h - 8 * s + bob, 17 * s, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#ffc76b";
-          ctx.beginPath();
-          ctx.ellipse(
-            0,
-            gy - o.h - 3 * s + bob,
-            11 * s,
-            10 * s,
+          const hx = isSlider ? (-o.w / 2) * scale + 13 * s : 0;
+          const hy2 = gy - o.h * scale - 8 * s + bob;
+          cx.beginPath();
+          cx.arc(hx, hy2, (isBig ? 18 : 14) * s * scale, 0, Math.PI * 2);
+          cx.fill();
+          // Face
+          cx.fillStyle = "rgba(255,255,255,.4)";
+          cx.beginPath();
+          cx.ellipse(
+            hx,
+            hy2 + 4 * s * scale,
+            10 * s * scale,
+            9 * s * scale,
             0,
             0,
             Math.PI * 2,
           );
-          ctx.fill();
-          ctx.fillStyle = "white";
-          ctx.beginPath();
-          ctx.arc(-5 * s, gy - o.h - 11 * s + bob, 4 * s, 0, Math.PI * 2);
-          ctx.arc(5 * s, gy - o.h - 11 * s + bob, 4 * s, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#1a0a2e";
-          ctx.beginPath();
-          ctx.arc(-4 * s, gy - o.h - 10 * s + bob, 2.5 * s, 0, Math.PI * 2);
-          ctx.arc(6 * s, gy - o.h - 10 * s + bob, 2.5 * s, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = "#1a0a2e";
-          ctx.lineWidth = 2.5 * s;
-          ctx.beginPath();
-          ctx.moveTo(-9 * s, gy - o.h - 17 * s + bob);
-          ctx.lineTo(-1 * s, gy - o.h - 14 * s + bob);
-          ctx.moveTo(1 * s, gy - o.h - 17 * s + bob);
-          ctx.lineTo(9 * s, gy - o.h - 14 * s + bob);
-          ctx.stroke();
-          ctx.fillStyle = "rgba(255,255,255,0.8)";
-          ctx.font = `bold ${11 * s}px Boogaloo`;
-          ctx.textAlign = "center";
-          ctx.fillText("JUMP!", 0, gy - o.h - 36 * s + bob);
+          cx.fill();
+          // Angry eyes
+          cx.fillStyle = "white";
+          cx.beginPath();
+          cx.arc(
+            hx - 5 * s * scale,
+            hy2 - 2 * s * scale,
+            4 * s * scale,
+            0,
+            Math.PI * 2,
+          );
+          cx.arc(
+            hx + 5 * s * scale,
+            hy2 - 2 * s * scale,
+            4 * s * scale,
+            0,
+            Math.PI * 2,
+          );
+          cx.fill();
+          cx.fillStyle = "#1a0a2e";
+          cx.beginPath();
+          cx.arc(
+            hx - 4 * s * scale,
+            hy2 - 1 * s * scale,
+            2.5 * s * scale,
+            0,
+            Math.PI * 2,
+          );
+          cx.arc(
+            hx + 6 * s * scale,
+            hy2 - 1 * s * scale,
+            2.5 * s * scale,
+            0,
+            Math.PI * 2,
+          );
+          cx.fill();
+          // Angry brows
+          cx.strokeStyle = "#1a0a2e";
+          cx.lineWidth = 2.5 * s * scale;
+          cx.beginPath();
+          cx.moveTo(hx - 9 * s * scale, hy2 - 8 * s * scale);
+          cx.lineTo(hx - 1 * s * scale, hy2 - 5 * s * scale);
+          cx.moveTo(hx + 1 * s * scale, hy2 - 8 * s * scale);
+          cx.lineTo(hx + 9 * s * scale, hy2 - 5 * s * scale);
+          cx.stroke();
+          // Name tag
+          cx.fillStyle = "rgba(0,0,0,.6)";
+          cx.beginPath();
+          cx.roundRect(
+            hx - v.name.length * 3.5 * s * scale - 2,
+            hy2 - o.h * 0.6 * scale + bob,
+            v.name.length * 7 * s * scale + 4,
+            14 * s * scale,
+            4 * s,
+          );
+          cx.fill();
+          cx.fillStyle = "rgba(255,255,255,.9)";
+          cx.font = `bold ${10 * s * scale}px Boogaloo`;
+          cx.textAlign = "center";
+          cx.fillText(v.name, hx, hy2 - o.h * 0.45 * scale + bob);
+
+          cx.fillStyle = "rgba(255,255,255,.8)";
+          cx.font = `bold ${11 * s}px Boogaloo`;
+          cx.fillText(
+            v.action === "HIGH" ? "HIGH JUMP!" : v.action + "!",
+            isSlider ? 0 : 0,
+            gy - o.h * scale - 32 * s + bob,
+          );
+
+          cx.restore();
         }
-        ctx.restore();
+
+        cx.restore();
       }
 
-      function drawCollectibles() {
+      // ── DRAW GEMS ──
+      function drawGems() {
         for (const c of collectibles) {
           if (c.collected) continue;
-          const bob = Math.sin(frame * 0.1 + c.x * 0.01) * 4 * GC_RATIO;
-          ctx.save();
-          ctx.translate(c.x, c.y + bob);
-          if (c.rare) {
-            // Glow
-            ctx.shadowColor = c.rareData.color;
-            ctx.shadowBlur = 12 * GC_RATIO;
-            ctx.fillStyle = c.rareData.color;
-            ctx.beginPath();
-            ctx.arc(0, 0, c.r * 1.3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.font = `${c.r * 2}px serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(c.rareData.emoji, 0, 0);
-          } else {
-            ctx.fillStyle = "#ffd166";
-            ctx.shadowColor = "#ffd16699";
-            ctx.shadowBlur = 8 * GC_RATIO;
-            ctx.beginPath();
-            ctx.arc(0, 0, c.r, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.font = `${c.r * 1.8}px serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("🍌", 0, 1);
+          const bob = Math.sin(frame * 0.12 + c.x * 0.015) * 4 * S;
+          cx.save();
+          cx.translate(c.x, c.y + bob);
+          if (c.gem.rarity < 0.05) {
+            cx.shadowColor = c.gem.color;
+            cx.shadowBlur = 14 * S;
           }
-          ctx.restore();
+          cx.fillStyle = c.gem.color;
+          cx.beginPath();
+          cx.arc(0, 0, c.r, 0, Math.PI * 2);
+          cx.fill();
+          cx.shadowBlur = 0;
+          cx.font = `${c.r * 2}px serif`;
+          cx.textAlign = "center";
+          cx.textBaseline = "middle";
+          cx.fillText(c.gem.emoji, 0, 1);
+          cx.restore();
         }
       }
 
-      function drawParticles() {
+      // ── DRAW PARTICLES ──
+      function drawPtcl() {
         for (const p of particles) {
-          ctx.globalAlpha = p.life / p.maxLife;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r * (p.life / p.maxLife), 0, Math.PI * 2);
-          ctx.fill();
+          cx.globalAlpha = p.life / p.maxLife;
+          cx.fillStyle = p.col;
+          cx.beginPath();
+          cx.arc(p.x, p.y, p.r * (p.life / p.maxLife), 0, Math.PI * 2);
+          cx.fill();
         }
-        ctx.globalAlpha = 1;
+        cx.globalAlpha = 1;
       }
 
-      function render() {
-        ctx.clearRect(0, 0, W, H);
-        drawBg();
-        for (const c of collectibles) {
-          if (!c.collected) continue; // already drawn below
-        }
-        drawCollectibles();
-        for (const o of obstacles) drawObstacle(o);
-        drawPunch();
-        drawParticles();
-      }
-
-      // ---- TITLE BG ----
-      function drawTitleBg() {
-        if (!W) return;
-        ctx.clearRect(0, 0, W, H);
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, "#0d0420");
-        g.addColorStop(1, "#1a0a2e");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-        // Stars
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
-        for (let i = 0; i < 25; i++) {
-          ctx.beginPath();
-          ctx.arc(
-            (i * 137) % W,
-            (i * 79 + 23) % (H * 0.7),
-            (i % 3 === 0 ? 1.5 : 0.8) * GC_RATIO,
-            0,
-            Math.PI * 2,
-          );
-          ctx.fill();
-        }
-        // Moon
-        ctx.fillStyle = "#ffd166";
-        ctx.shadowColor = "#ffd16666";
-        ctx.shadowBlur = 15 * GC_RATIO;
-        ctx.beginPath();
-        ctx.arc(W * 0.85, H * 0.15, 20 * GC_RATIO, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      // ---- TITLE ART (Punch hugging plushie from behind) ----
+      // ── TITLE ART (Punch hugging plushie from behind, emotional) ──
       function drawTitleArt() {
-        const tc = document.getElementById("title-art-canvas");
+        const tc = document.getElementById("title-canvas");
         if (!tc) return;
-        const sz = Math.round(Math.min(window.innerWidth * 0.18, 130));
+        const sz = Math.round(
+          Math.min(window.innerWidth * 0.2, 148, window.innerHeight * 0.22),
+        );
         tc.width = sz;
         tc.height = sz;
-        tc.style.width = sz + "px";
-        tc.style.height = sz + "px";
         const tx = tc.getContext("2d");
-        const s = sz / 130;
-
+        const s = sz / 140;
         tx.clearRect(0, 0, sz, sz);
 
-        // Glow circle behind
-        const glowGrad = tx.createRadialGradient(
-          sz / 2,
-          sz * 0.6,
+        // Background glow
+        const glow = tx.createRadialGradient(
+          sz * 0.5,
+          sz * 0.65,
           0,
-          sz / 2,
-          sz * 0.6,
-          sz * 0.45,
+          sz * 0.5,
+          sz * 0.65,
+          sz * 0.55,
         );
-        glowGrad.addColorStop(0, "rgba(255,107,53,0.15)");
-        glowGrad.addColorStop(1, "transparent");
-        tx.fillStyle = glowGrad;
+        glow.addColorStop(0, "rgba(255,100,53,.18)");
+        glow.addColorStop(1, "transparent");
+        tx.fillStyle = glow;
         tx.fillRect(0, 0, sz, sz);
 
-        tx.save();
-        tx.translate(sz / 2, sz * 0.72);
+        // Subtle ground
+        tx.fillStyle = "rgba(45,27,105,.4)";
+        tx.fillRect(0, sz * 0.85, sz, sz * 0.15);
 
-        // --- Plushie (big, in front, slightly tilted) ---
         tx.save();
-        tx.rotate(-0.18);
-        // plushie body
-        tx.fillStyle = "#ff4d6d";
+        tx.translate(sz * 0.5, sz * 0.78);
+
+        // PLUSHIE — large, warm, in front, facing slightly toward viewer
+        tx.save();
+        tx.rotate(-0.15);
+        // Shadow under plushie
+        tx.fillStyle = "rgba(0,0,0,.35)";
         tx.beginPath();
-        tx.arc(0, 0, 28 * s, 0, Math.PI * 2);
+        tx.ellipse(0, 4 * s, 26 * s, 9 * s, 0, 0, Math.PI * 2);
         tx.fill();
-        // plushie glow
-        tx.shadowColor = "#ff4d6d";
-        tx.shadowBlur = 14 * s;
+        // Body
         tx.fillStyle = "#ff4d6d";
+        tx.shadowColor = "#ff4d6d";
+        tx.shadowBlur = 16 * s;
         tx.beginPath();
         tx.arc(0, 0, 28 * s, 0, Math.PI * 2);
         tx.fill();
         tx.shadowBlur = 0;
-        // face
+        // Face glow
         tx.fillStyle = "#ff8fa3";
         tx.beginPath();
         tx.ellipse(0, 4 * s, 20 * s, 18 * s, 0, 0, Math.PI * 2);
         tx.fill();
-        // eyes (closed, happy)
+        // Closed happy eyes
         tx.strokeStyle = "#1a0a2e";
         tx.lineWidth = 2.5 * s;
         tx.beginPath();
-        tx.arc(-8 * s, -4 * s, 5 * s, Math.PI * 0.1, Math.PI * 0.9);
-        tx.arc(8 * s, -4 * s, 5 * s, Math.PI * 0.1, Math.PI * 0.9);
+        tx.arc(-8 * s, -5 * s, 5 * s, Math.PI * 0.1, Math.PI * 0.9);
         tx.stroke();
-        // blush
-        tx.fillStyle = "rgba(255,100,120,0.4)";
         tx.beginPath();
-        tx.ellipse(-12 * s, 4 * s, 6 * s, 4 * s, 0, 0, Math.PI * 2);
-        tx.ellipse(12 * s, 4 * s, 6 * s, 4 * s, 0, 0, Math.PI * 2);
+        tx.arc(8 * s, -5 * s, 5 * s, Math.PI * 0.1, Math.PI * 0.9);
+        tx.stroke();
+        // Blush
+        tx.fillStyle = "rgba(255,100,120,.45)";
+        tx.beginPath();
+        tx.ellipse(-13 * s, 3 * s, 6 * s, 4 * s, 0, 0, Math.PI * 2);
+        tx.ellipse(13 * s, 3 * s, 6 * s, 4 * s, 0, 0, Math.PI * 2);
         tx.fill();
-        // ears
+        // Ears
         tx.fillStyle = "#ff4d6d";
         tx.beginPath();
         tx.arc(-22 * s, -20 * s, 8 * s, 0, Math.PI * 2);
@@ -2828,71 +3041,67 @@
         tx.fill();
         tx.restore();
 
-        // --- Punch (behind, peeking, arms around plushie) ---
+        // PUNCH — behind, arms wrapped around, peeking with big hopeful eyes
         tx.save();
-        tx.translate(2 * s, -18 * s);
-
-        // Arms reaching around (behind plushie)
+        tx.translate(3 * s, -16 * s);
+        // Left arm around
         tx.fillStyle = "#b36a25";
-        // Left arm
         tx.save();
-        tx.rotate(0.5);
+        tx.rotate(0.55);
         tx.beginPath();
-        tx.roundRect(-8 * s, 12 * s, 14 * s, 30 * s, 6 * s);
+        tx.roundRect(-8 * s, 10 * s, 15 * s, 30 * s, 7 * s);
         tx.fill();
         tx.restore();
-        // Right arm
+        // Right arm around
         tx.save();
         tx.rotate(-0.4);
         tx.beginPath();
-        tx.roundRect(-6 * s, 12 * s, 14 * s, 28 * s, 6 * s);
+        tx.roundRect(-7 * s, 10 * s, 15 * s, 28 * s, 7 * s);
         tx.fill();
         tx.restore();
-
-        // Body (behind)
+        // Body (partially behind)
         tx.fillStyle = "#b36a25";
         tx.beginPath();
         tx.roundRect(-14 * s, 0, 28 * s, 30 * s, 8 * s);
         tx.fill();
-
-        // Head peeking from behind plushie
+        // Head peeking
         tx.fillStyle = "#c47a2e";
         tx.beginPath();
         tx.arc(1 * s, -16 * s, 18 * s, 0, Math.PI * 2);
         tx.fill();
-
-        // Face
         tx.fillStyle = "#e8a96a";
         tx.beginPath();
         tx.ellipse(1 * s, -12 * s, 13 * s, 12 * s, 0, 0, Math.PI * 2);
         tx.fill();
-
-        // HAPPY eyes (shiny)
+        // BIG hopeful eyes looking forward/slightly up
         tx.fillStyle = "#1a0a2e";
         tx.beginPath();
-        tx.arc(-5 * s, -18 * s, 4 * s, 0, Math.PI * 2);
-        tx.arc(7 * s, -18 * s, 4 * s, 0, Math.PI * 2);
+        tx.arc(-6 * s, -18 * s, 5 * s, 0, Math.PI * 2);
+        tx.arc(8 * s, -18 * s, 5 * s, 0, Math.PI * 2);
         tx.fill();
         tx.fillStyle = "white";
         tx.beginPath();
-        tx.arc(-4 * s, -19 * s, 1.5 * s, 0, Math.PI * 2);
-        tx.arc(8 * s, -19 * s, 1.5 * s, 0, Math.PI * 2);
+        tx.arc(-5 * s, -19 * s, 2 * s, 0, Math.PI * 2);
+        tx.arc(9 * s, -19 * s, 2 * s, 0, Math.PI * 2);
         tx.fill();
-
-        // Big smile
+        // Extra shine
+        tx.fillStyle = "rgba(255,255,255,.6)";
+        tx.beginPath();
+        tx.arc(-4 * s, -20 * s, 0.8 * s, 0, Math.PI * 2);
+        tx.arc(10 * s, -20 * s, 0.8 * s, 0, Math.PI * 2);
+        tx.fill();
+        // Slight smile, content
         tx.strokeStyle = "#1a0a2e";
         tx.lineWidth = 2.5 * s;
         tx.beginPath();
-        tx.arc(1 * s, -10 * s, 7 * s, 0.1, Math.PI - 0.1);
+        tx.arc(1 * s, -8 * s, 6 * s, 0.1, Math.PI - 0.1);
         tx.stroke();
-
-        // Blush
-        tx.fillStyle = "rgba(220,120,60,0.5)";
+        // Blush on Punch
+        tx.fillStyle = "rgba(220,110,50,.45)";
         tx.beginPath();
-        tx.ellipse(-9 * s, -12 * s, 5 * s, 3 * s, 0, 0, Math.PI * 2);
-        tx.ellipse(11 * s, -12 * s, 5 * s, 3 * s, 0, 0, Math.PI * 2);
+        tx.ellipse(-10 * s, -13 * s, 5 * s, 3 * s, 0, 0, Math.PI * 2);
+        tx.ellipse(12 * s, -13 * s, 5 * s, 3 * s, 0, 0, Math.PI * 2);
         tx.fill();
-
         // Ears
         tx.fillStyle = "#c47a2e";
         tx.beginPath();
@@ -2904,241 +3113,279 @@
         tx.arc(-17 * s, -20 * s, 4 * s, 0, Math.PI * 2);
         tx.arc(19 * s, -20 * s, 4 * s, 0, Math.PI * 2);
         tx.fill();
-
-        // Little hearts floating
+        // Floating hearts
         tx.font = `${10 * s}px serif`;
         tx.textAlign = "center";
-        tx.fillStyle = "#ff4d6d";
-        tx.globalAlpha = 0.8;
-        tx.fillText("💛", -24 * s, -32 * s);
-        tx.fillText("❤️", 22 * s, -28 * s);
+        tx.globalAlpha = 0.85;
+        tx.fillText("💛", -26 * s, -34 * s);
+        tx.fillText("❤️", 24 * s, -30 * s);
+        tx.fillText("✨", 30 * s, -44 * s);
         tx.globalAlpha = 1;
-
         tx.restore();
         tx.restore();
       }
 
-      // ---- WIN ART ----
-      function drawWinArt() {
-        const wc = document.getElementById("win-art-canvas");
-        const wx = wc.getContext("2d");
+      // ── TITLE BG ──
+      function drawTitleScene() {
+        if (!W) return;
+        cx.clearRect(0, 0, W, H);
+        const g = cx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, "#0d0420");
+        g.addColorStop(1, "#1a0a2e");
+        cx.fillStyle = g;
+        cx.fillRect(0, 0, W, H);
+        cx.fillStyle = "rgba(255,255,255,.45)";
+        for (let i = 0; i < 25; i++) {
+          cx.beginPath();
+          cx.arc(
+            (i * 137) % W,
+            (i * 79 + 23) % (H * 0.7),
+            (i % 3 === 0 ? 1.5 : 0.8) * S,
+            0,
+            Math.PI * 2,
+          );
+          cx.fill();
+        }
+        cx.fillStyle = "#ffd166";
+        cx.shadowColor = "#ffd16655";
+        cx.shadowBlur = 16 * S;
+        cx.beginPath();
+        cx.arc(W * 0.83, H * 0.15, 22 * S, 0, Math.PI * 2);
+        cx.fill();
+        cx.shadowBlur = 0;
+      }
+
+      // ── WIN SCENE (animated sleeping) ──
+      let winF = 0,
+        winAnim;
+      function drawWinScene() {
+        const wc = document.getElementById("win-canvas");
+        if (!wc) return;
         const w = wc.width,
           h = wc.height;
-        wx.clearRect(0, 0, w, h);
+        const wx = wc.getContext("2d");
 
-        // Starry night BG
-        const bg = wx.createLinearGradient(0, 0, 0, h);
-        bg.addColorStop(0, "#0d0420");
-        bg.addColorStop(1, "#1a0a2e");
-        wx.fillStyle = bg;
-        wx.fillRect(0, 0, w, h);
-
-        // Stars
-        wx.fillStyle = "rgba(255,255,255,0.6)";
-        for (let i = 0; i < 15; i++) {
+        function drawFrame() {
+          winF++;
+          wx.clearRect(0, 0, w, h);
+          // Night sky
+          const bg = wx.createLinearGradient(0, 0, 0, h);
+          bg.addColorStop(0, "#05020f");
+          bg.addColorStop(1, "#1a0a2e");
+          wx.fillStyle = bg;
+          wx.fillRect(0, 0, w, h);
+          // Stars twinkling
+          for (let i = 0; i < 20; i++) {
+            const sx = (i * 97) % w,
+              sy = (i * 53) % (h * 0.55);
+            const twink = 0.4 + 0.6 * Math.abs(Math.sin(winF * 0.05 + i * 1.3));
+            wx.globalAlpha = twink;
+            wx.fillStyle = "white";
+            wx.beginPath();
+            wx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+            wx.fill();
+          }
+          wx.globalAlpha = 1;
+          // Moon
+          wx.fillStyle = "#ffd166";
+          wx.shadowColor = "#ffd16666";
+          wx.shadowBlur = 12;
           wx.beginPath();
-          wx.arc((i * 97) % w, (i * 53) % (h * 0.7), 1.2, 0, Math.PI * 2);
+          wx.arc(w * 0.82, h * 0.18, 16, 0, Math.PI * 2);
           wx.fill();
+          wx.shadowBlur = 0;
+          // Ground
+          wx.fillStyle = "#1a0a3e";
+          wx.fillRect(0, h * 0.68, w, h * 0.32);
+          wx.strokeStyle = "#2d1b69";
+          wx.lineWidth = 2;
+          wx.beginPath();
+          wx.moveTo(0, h * 0.68);
+          wx.lineTo(w, h * 0.68);
+          wx.stroke();
+          // Rocks
+          wx.fillStyle = "#2a2240";
+          wx.beginPath();
+          wx.ellipse(w * 0.25, h * 0.68, 30, 18, -0.2, 0, Math.PI * 2);
+          wx.fill();
+          wx.beginPath();
+          wx.ellipse(w * 0.75, h * 0.68, 22, 14, 0.1, 0, Math.PI * 2);
+          wx.fill();
+          // Wind particles (blowing grass)
+          wx.strokeStyle = "rgba(100,200,120,.3)";
+          wx.lineWidth = 1.5;
+          for (let i = 0; i < 8; i++) {
+            const gx = i * (w / 8) + 20,
+              gy = h * 0.68;
+            const sway = Math.sin(winF * 0.04 + i * 0.8) * 6;
+            wx.beginPath();
+            wx.moveTo(gx, gy);
+            wx.quadraticCurveTo(gx + sway, gy - 12, gx + sway * 1.5, gy - 20);
+            wx.stroke();
+          }
+
+          const cx2 = w * 0.5,
+            cy2 = h * 0.72;
+          const breathe = Math.sin(winF * 0.06) * 0.5; // gentle breathing
+
+          // Mother shadow underneath (silhouette, abstract)
+          wx.fillStyle = "rgba(45,20,80,.65)";
+          wx.beginPath();
+          wx.ellipse(cx2, cy2 + 12, 52, 20, 0, 0, Math.PI * 2);
+          wx.fill();
+          // Mother arms silhouette
+          wx.fillStyle = "rgba(35,15,65,.7)";
+          wx.beginPath();
+          wx.ellipse(cx2 - 22, cy2 + 2, 18, 28, -0.3, 0, Math.PI * 2);
+          wx.fill();
+          wx.beginPath();
+          wx.ellipse(cx2 + 22, cy2 + 2, 18, 28, 0.3, 0, Math.PI * 2);
+          wx.fill();
+
+          // Plushie — warm glowing
+          wx.save();
+          wx.translate(cx2 - 18, cy2 - 22 + breathe * 0.5);
+          wx.fillStyle = "#ff4d6d";
+          wx.shadowColor = "#ff4d6d66";
+          wx.shadowBlur = 10;
+          wx.beginPath();
+          wx.arc(0, 0, 16, 0, Math.PI * 2);
+          wx.fill();
+          wx.shadowBlur = 0;
+          wx.fillStyle = "#ff8fa3";
+          wx.beginPath();
+          wx.ellipse(0, 4, 12, 10, 0, 0, Math.PI * 2);
+          wx.fill();
+          wx.fillStyle = "#ff4d6d";
+          wx.beginPath();
+          wx.arc(-12, -12, 5, 0, Math.PI * 2);
+          wx.arc(6, -13, 5, 0, Math.PI * 2);
+          wx.fill();
+          wx.restore();
+
+          // FUR blowing (small dots around plushie)
+          for (let i = 0; i < 6; i++) {
+            const angle = winF * 0.02 + i * ((Math.PI * 2) / 6);
+            const dist = 20 + Math.sin(winF * 0.08 + i) * 4;
+            const fx = cx2 - 18 + Math.cos(angle) * dist,
+              fy = cy2 - 22 + Math.sin(angle) * dist;
+            wx.globalAlpha = 0.15 + 0.1 * Math.sin(winF * 0.06 + i);
+            wx.fillStyle = "#ff8fa3";
+            wx.beginPath();
+            wx.arc(fx, fy, 2, 0, Math.PI * 2);
+            wx.fill();
+          }
+          wx.globalAlpha = 1;
+
+          // Punch sleeping, curled around plushie
+          wx.save();
+          wx.translate(cx2 + 4, cy2 - 24 + breathe);
+          // Body (curled)
+          wx.fillStyle = "#c47a2e";
+          wx.beginPath();
+          wx.roundRect(-10, -18, 28, 24, 10);
+          wx.fill();
+          // Head
+          wx.beginPath();
+          wx.arc(22, -18, 16, 0, Math.PI * 2);
+          wx.fill();
+          wx.fillStyle = "#e8a96a";
+          wx.beginPath();
+          wx.ellipse(22, -14, 11, 10, 0, 0, Math.PI * 2);
+          wx.fill();
+          // Closed sleeping eyes
+          wx.strokeStyle = "#1a0a2e";
+          wx.lineWidth = 2;
+          wx.beginPath();
+          wx.arc(16, -20, 4, Math.PI * 0.1, Math.PI * 0.9);
+          wx.stroke();
+          wx.beginPath();
+          wx.arc(28, -20, 4, Math.PI * 0.1, Math.PI * 0.9);
+          wx.stroke();
+          // Tiny smile
+          wx.beginPath();
+          wx.arc(22, -13, 3, 0.2, Math.PI - 0.2);
+          wx.stroke();
+          // Ears
+          wx.fillStyle = "#c47a2e";
+          wx.beginPath();
+          wx.arc(8, -24, 6, 0, Math.PI * 2);
+          wx.arc(36, -24, 6, 0, Math.PI * 2);
+          wx.fill();
+          // zzz floating
+          wx.fillStyle = "#ffd166";
+          wx.font = "bold 11px Boogaloo";
+          wx.textAlign = "left";
+          const zOff = Math.sin(winF * 0.04) * 4;
+          wx.globalAlpha = 0.7 + 0.3 * Math.sin(winF * 0.06);
+          wx.fillText("z", 40, -28 + zOff);
+          wx.fillText("z", 47, -20 + zOff * 0.7);
+          wx.fillText("z", 52, -35 + zOff * 0.5);
+          wx.globalAlpha = 1;
+          wx.restore();
+
+          // Wind sound visual (wavy lines)
+          wx.strokeStyle = "rgba(150,200,255,.08)";
+          wx.lineWidth = 1.5;
+          for (let i = 0; i < 3; i++) {
+            const wy = h * 0.3 + i * 8;
+            const wph = winF * 0.03 + i * 1.2;
+            wx.beginPath();
+            wx.moveTo(0, wy);
+            for (let x = 0; x < w; x += 10)
+              wx.lineTo(x, wy + Math.sin(x * 0.04 + wph) * 3);
+            wx.stroke();
+          }
+
+          if (gameState === "won") winAnim = requestAnimationFrame(drawFrame);
         }
-
-        // Moon
-        wx.fillStyle = "#ffd166";
-        wx.shadowColor = "#ffd166";
-        wx.shadowBlur = 10;
-        wx.beginPath();
-        wx.arc(w * 0.85, h * 0.18, 14, 0, Math.PI * 2);
-        wx.fill();
-        wx.shadowBlur = 0;
-
-        // Ground
-        wx.fillStyle = "#2d1b69";
-        wx.fillRect(0, h * 0.7, w, h * 0.3);
-        wx.strokeStyle = "#4a3a8a";
-        wx.lineWidth = 2;
-        wx.beginPath();
-        wx.moveTo(0, h * 0.7);
-        wx.lineTo(w, h * 0.7);
-        wx.stroke();
-
-        const cx = w / 2,
-          cy = h * 0.72;
-        const s = w / 280;
-
-        // Shadow below (mother silhouette hint)
-        wx.fillStyle = "rgba(45,27,105,0.7)";
-        wx.beginPath();
-        wx.ellipse(cx, cy + 10, 55, 18, 0, 0, Math.PI * 2);
-        wx.fill();
-        // Shadow shows bigger shape underneath (mother holding)
-        wx.fillStyle = "rgba(30,15,70,0.6)";
-        wx.beginPath();
-        wx.ellipse(cx, cy + 8, 45, 30, 0, 0, Math.PI);
-        wx.fill();
-
-        // Plushie
-        wx.fillStyle = "#ff4d6d";
-        wx.shadowColor = "#ff4d6d";
-        wx.shadowBlur = 12;
-        wx.beginPath();
-        wx.arc(cx - 18, cy - 20, 18, 0, Math.PI * 2);
-        wx.fill();
-        wx.shadowBlur = 0;
-        wx.fillStyle = "#ff8fa3";
-        wx.beginPath();
-        wx.ellipse(cx - 18, cy - 16, 13, 12, 0, 0, Math.PI * 2);
-        wx.fill();
-        // plushie ears
-        wx.fillStyle = "#ff4d6d";
-        wx.beginPath();
-        wx.arc(cx - 28, cy - 32, 6, 0, Math.PI * 2);
-        wx.arc(cx - 10, cy - 33, 6, 0, Math.PI * 2);
-        wx.fill();
-
-        // Punch sleeping
-        wx.fillStyle = "#c47a2e";
-        wx.beginPath();
-        wx.roundRect(cx - 12, cy - 28, 38, 30, 8);
-        wx.fill();
-        wx.beginPath();
-        wx.arc(cx + 22, cy - 38, 17, 0, Math.PI * 2);
-        wx.fill();
-        wx.fillStyle = "#e8a96a";
-        wx.beginPath();
-        wx.ellipse(cx + 22, cy - 34, 12, 11, 0, 0, Math.PI * 2);
-        wx.fill();
-        // closed eyes (sleeping)
-        wx.strokeStyle = "#1a0a2e";
-        wx.lineWidth = 2;
-        wx.beginPath();
-        wx.arc(cx + 16, cy - 40, 4, Math.PI * 0.1, Math.PI * 0.9);
-        wx.arc(cx + 28, cy - 40, 4, Math.PI * 0.1, Math.PI * 0.9);
-        wx.stroke();
-        // ears
-        wx.fillStyle = "#c47a2e";
-        wx.beginPath();
-        wx.arc(cx + 8, cy - 45, 6, 0, Math.PI * 2);
-        wx.fill();
-        wx.beginPath();
-        wx.arc(cx + 36, cy - 45, 6, 0, Math.PI * 2);
-        wx.fill();
-        // zzz
-        wx.fillStyle = "#ffd166";
-        wx.font = "bold 12px Boogaloo";
-        wx.textAlign = "left";
-        wx.fillText("z z z", cx + 36, cy - 52);
-
-        // Hearts
-        wx.font = "12px serif";
-        wx.textAlign = "center";
-        wx.fillText("💛", cx - 2, cy - 52);
-        wx.fillText("✨", cx + 50, cy - 38);
+        drawFrame();
       }
 
-      // ---- GAME OVER ----
-      function triggerGameOver() {
-        state = "over";
-        stopBgMusic();
-        sfxDeath();
-        saveBest();
-
-        const fail =
-          FAIL_MESSAGES[Math.floor(Math.random() * FAIL_MESSAGES.length)];
-        document.getElementById("fail-title").textContent = fail.title;
-        document.getElementById("fail-title").style.color = fail.color;
-        document.getElementById("fail-reason").textContent = fail.reason;
-        document.getElementById("go-score").textContent = score;
-        document.getElementById("go-level").textContent = level;
-        document.getElementById("go-best").textContent = bestScore;
-        document.getElementById("go-maxlevel").textContent = bestLevel;
-
-        const canContinue = lives > 0 && level <= 20;
-        document.getElementById("continue-btn").style.display = canContinue
-          ? "block"
-          : "none";
-        document.getElementById("continue-info").textContent =
-          lives > 0
-            ? `You have ${lives} heart${lives > 1 ? "s" : ""} left — continue from Level ${level}?`
-            : "No hearts left. Start fresh!";
-
-        showHUD(false);
-        showScreen("gameover-screen");
+      // ── MAIN LOOP ──
+      function render() {
+        cx.clearRect(0, 0, W, H);
+        drawBg();
+        drawGems();
+        for (const o of obstacles) drawVillain(o);
+        drawPunch();
+        drawPtcl();
       }
 
-      function continueGame() {
-        if (lives <= 0) {
-          restartGame();
+      function loop() {
+        if (gameState !== "playing") {
+          cancelAnimationFrame(animID);
           return;
         }
-        hideScreen("gameover-screen");
-        initPunch();
-        obstacles = [];
-        collectibles = [];
-        distance = 0;
-        hitCooldown = 0;
-        showHUD(true);
-        updateHeartsDisplay();
-        showLevelToast(level, () => {
-          state = "playing";
-          playBgMusic();
-          loop();
-        });
-      }
-
-      function restartGame() {
-        initGame();
-        startLevel(1);
-      }
-
-      function triggerWin() {
-        state = "won";
-        stopBgMusic();
-        sfxWin();
-        saveBest();
-        const elapsed = Math.round((Date.now() - gameStartTime) / 1000);
-        document.getElementById("win-score").textContent = score;
-        document.getElementById("win-time").textContent = elapsed + "s";
-        showHUD(false);
-        showScreen("win-screen");
-        setTimeout(drawWinArt, 100);
-      }
-
-      // ---- SHARE ----
-      function shareScore() {
-        const text = `🐒 I got ${score} pts on Level ${level} in Punch's Great Escape!\nBest level: ${bestLevel} | Best score: ${bestScore}\n\nCan you beat me? #PunchMonkey\nhttps://punch-monkey.vercel.app`;
-        tryShare(text);
-      }
-      function shareWin() {
-        const elapsed = document.getElementById("win-time").textContent;
-        const text = `🧸 I BEAT Punch's Great Escape in ${elapsed}!\nAll 20 levels done! Score: ${score}\n\nThink you can do it? #PunchMonkey\nhttps://punch-monkey.vercel.app`;
-        tryShare(text);
-      }
-      function tryShare(text) {
-        if (navigator.share) {
-          navigator
-            .share({ title: "Punch's Great Escape", text })
-            .catch(() => {});
-        } else {
-          try {
-            navigator.clipboard.writeText(text);
-            alert("Score copied to clipboard! Share it 🐒\n\n" + text);
-          } catch (e) {
-            alert("Share this:\n\n" + text);
-          }
-        }
-      }
-
-      // ---- MAIN LOOP ----
-      let animId;
-      function loop() {
-        if (state !== "playing") return;
         update();
         render();
-        animId = requestAnimationFrame(loop);
+        animID = requestAnimationFrame(loop);
       }
 
-      // ---- INIT ----
+      // ── TITLE IDLE ANIMATION ──
+      let titleAnim;
+      function animateTitle() {
+        if (
+          gameState !== "idle" &&
+          gameState !== "howtoplay" &&
+          gameState !== "about"
+        ) {
+          cancelAnimationFrame(titleAnim);
+          return;
+        }
+        drawTitleScene();
+        titleAnim = requestAnimationFrame(animateTitle);
+      }
+
+      // ── BOOT ──
       resize();
       drawTitleArt();
+      drawTitleScene();
+      startMusic("title");
+
+      // Start idle canvas animation
+      gameState = "idle";
+      animateTitle();
     </script>
   </body>
 </html>
