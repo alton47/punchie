@@ -701,8 +701,8 @@ const FAILS = [
 /** Physics constants (per-second in canvas design units) */
 const PHYSICS = {
   gravity: 1800,
-  jumpVel: -640,
-  dJumpVel: -530,
+  jumpVel: -1840,
+  dJumpVel: -2130,
   baseSpeed: 300,
 };
 
