@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>About — Punch's Great Escape 🐒</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='58' r='34' fill='%23c47a2e'/><circle cx='50' cy='46' r='26' fill='%23c47a2e'/><ellipse cx='50' cy='52' rx='18' ry='16' fill='%23e8a96a'/><circle cx='43' cy='41' r='4.5' fill='%231a0a2e'/><circle cx='57' cy='41' r='4.5' fill='%231a0a2e'/><circle cx='38' cy='60' r='3.5' fill='%23ff4d6d'/></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* ── About page specific ── */
+      body {
+        min-height: 100dvh;
+        overflow-y: auto;
+      }
+
+      .about-hero {
+        /* True full background — no gap at edges */
+        width: 100%;
+        min-height: 100dvh;
+        background:
+          radial-gradient(
+            ellipse 80% 50% at 50% 0%,
+            rgba(255, 107, 53, 0.15) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 60% 40% at 80% 100%,
+            rgba(167, 139, 250, 0.1) 0%,
+            transparent 60%
+          ),
+          linear-gradient(170deg, #050115 0%, #0f0428 60%, #1a0845 100%);
+        padding: 80px 20px 60px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .about-title {
+        font-size: clamp(32px, 7vw, 64px);
+        color: var(--orange);
+        text-shadow: 3px 3px 0 var(--orange-d);
+        text-align: center;
+        margin-bottom: 4px;
+      }
+
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        width: 100%;
+        max-width: 900px;
+      }
+
+      @media (min-width: 640px) {
+        .about-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .about-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: var(--r-md);
+        padding: 18px 22px;
+        animation: fadeIn 0.4s ease both;
+      }
+      .about-card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .about-card:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .about-card:nth-child(3) {
+        animation-delay: 0.15s;
+      }
+      .about-card:nth-child(4) {
+        animation-delay: 0.2s;
+      }
+      .about-card:nth-child(5) {
+        animation-delay: 0.25s;
+      }
+      .about-card:nth-child(6) {
+        animation-delay: 0.3s;
+      }
+
+      .about-card.wide {
+        grid-column: 1 / -1;
+      }
+
+      .card-title {
+        font-size: clamp(14px, 2.5vw, 18px);
+        color: var(--yellow);
+        margin-bottom: 10px;
+      }
+
+      .about-card p,
+      .about-card li {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(11px, 1.9vw, 14px);
+        color: rgba(255, 255, 255, 0.78);
+        line-height: 1.75;
+      }
+
+      .about-card ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .about-card li {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 4px 0;
+        display: flex;
+        align-items: baseline;
+        gap: 7px;
+      }
+
+      .about-card li strong {
+        color: rgba(255, 220, 150, 0.9);
+        min-width: 70px;
+      }
+      .about-card li em {
+        color: var(--teal);
+        font-style: normal;
+      }
+
+      /* ── Control grid ── */
+      .ctrl-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      @media (min-width: 500px) {
+        .ctrl-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .ctrl-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--r-sm);
+        padding: 9px 10px;
+      }
+
+      .ctrl-key {
+        font-family: "Boogaloo", cursive;
+        font-size: clamp(11px, 1.8vw, 14px);
+        color: var(--yellow);
+        margin-bottom: 4px;
+      }
+
+      .ctrl-desc {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(10px, 1.6vw, 12px);
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.4;
+      }
+
+      /* ── Gem grid ── */
+      .gem-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 7px;
+      }
+
+      @media (min-width: 500px) {
+        .gem-grid {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
+
+      .gem-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--r-sm);
+        padding: 8px 6px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .gem-icon {
+        font-size: clamp(16px, 3vw, 22px);
+      }
+      .gem-name {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(9px, 1.5vw, 11px);
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.3;
+        text-align: center;
+      }
+
+      /* ── Villain chips ── */
+      .villain-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .vchip {
+        background: rgba(255, 77, 109, 0.1);
+        border: 1px solid rgba(255, 77, 109, 0.25);
+        border-radius: 8px;
+        padding: 5px 11px;
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(10px, 1.7vw, 12px);
+        color: rgba(255, 190, 190, 0.9);
+      }
+      .vchip strong {
+        color: var(--yellow);
+      }
+
+      /* ── CTA at bottom ── */
+      .about-cta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 8px;
+        animation: fadeIn 0.4s 0.4s both;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a href="index.html" class="nav-logo">🐒 Punch</a>
+      <div class="nav-links">
+        <button
+          class="btn-mute"
+          id="mute-btn"
+          onclick="PunchAudio.toggleMute()"
+        >
+          🔊
+        </button>
+        <a
+          href="https://buymeacoffee.com/allanito"
+          target="_blank"
+          class="btn btn-sm"
+          style="
+            background: rgba(255, 213, 79, 0.1);
+            border-color: rgba(255, 213, 79, 0.3);
+            color: var(--yellow);
+          "
+          >☕ Coffee</a
+        >
+      </div>
+    </nav>
+
+    <main class="about-hero">
+      <h1 class="about-title">📖 About the Game</h1>
+
+      <div class="about-grid">
+        <!-- Story -->
+        <div class="about-card">
+          <div class="card-title">🐒 The Story</div>
+          <p>
+            Inspired by the viral <strong>Punch monkey trend</strong> that swept
+            the internet in early 2026 — a tiny monkey and his beloved red
+            plushie. The bully gang stole it. He's going to fight through 10
+            wild levels to get it back.
+          </p>
+          <br />
+          <p>
+            Built by <strong>Allan</strong> who saw the trend and had to make
+            something for it.<br />
+            <a href="https://github.com/alton47" target="_blank"
+              >@alton47 on GitHub</a
+            >
+            ·
+            <a href="https://buymeacoffee.com/allanito" target="_blank"
+              >Buy him a coffee ☕</a
+            >
+          </p>
+        </div>
+
+        <!-- How to play -->
+        <div class="about-card" id="controls-card">
+          <div class="card-title">🎮 How to Play</div>
+          <div class="ctrl-grid" id="ctrl-grid"></div>
+        </div>
+
+        <!-- Villains -->
+        <div class="about-card">
+          <div class="card-title">👿 The Villain Gang</div>
+          <ul>
+            <li>
+              <strong>Knuckles</strong><em>Slide</em> – low slider, jump over!
+            </li>
+            <li><strong>Bobo</strong><em>Jump</em> – mid-height, jump over!</li>
+            <li>
+              <strong>Creepvine</strong><em>Duck</em> – hanging vine, duck
+              under!
+            </li>
+            <li>
+              <strong>Rockhead</strong><em>Jump</em> – big stone thrown at you!
+            </li>
+            <li>
+              <strong>Slippy</strong><em>Jump</em> – banana peel slides at you!
+            </li>
+            <li>
+              <strong>BIG Bobo</strong><em>High</em> – tall bully, double-jump!
+            </li>
+            <li>
+              <strong>Swingby</strong><em>Duck</em> – swings down from above!
+            </li>
+            <li>
+              <strong>Twin Trap</strong><em>Jump</em> – two at once, stay sharp!
+            </li>
+            <li><strong>Crusher</strong><em>Jump</em> – rolling boulder!</li>
+            <li>
+              <strong>Stabby</strong><em>High</em> – spike wall, highest jump!
+            </li>
+          </ul>
+        </div>
+
+        <!-- Gems -->
+        <div class="about-card">
+          <div class="card-title">✨ Gem Powers</div>
+          <div class="gem-grid">
+            <div class="gem-card">
+              <div class="gem-icon">🪙</div>
+              <div class="gem-name">Gold Coin<br />+30 pts</div>
+            </div>
+            <div class="gem-card">
+              <div class="gem-icon">🍌</div>
+              <div class="gem-name">Banana<br />+50 pts</div>
+            </div>
+            <div class="gem-card">
+              <div class="gem-icon">💎</div>
+              <div class="gem-name">Ruby<br />+120 pts</div>
+            </div>
+            <div class="gem-card">
+              <div class="gem-icon">❤️</div>
+              <div class="gem-name heart-glow">Heart Gem<br />+1 Life!</div>
+            </div>
+            <div class="gem-card">
+              <div class="gem-icon">⭐</div>
+              <div class="gem-name">Lucky Star<br />+200 pts</div>
+            </div>
+            <div class="gem-card">
+              <div class="gem-icon">🧲</div>
+              <div class="gem-name">Magnet<br />Auto-pull!</div>
+            </div>
+            <div class="gem-card">
+              <div class="gem-icon">🔮</div>
+              <div class="gem-name">Immunity<br />5s invincible!</div>
+            </div>
+            <div class="gem-card">
+              <div class="gem-icon">💠</div>
+              <div class="gem-name">Diamond<br />+400 pts!!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Levels -->
+        <div class="about-card wide">
+          <div class="card-title">🗺️ 10 Levels</div>
+          <div class="villain-chips">
+            <span class="vchip"
+              >1. 🏛️ <strong>Monkey Zoo</strong> — calm start</span
+            >
+            <span class="vchip"
+              >2. 🎋 <strong>Bamboo Forest</strong> — vines appear</span
+            >
+            <span class="vchip"
+              >3. 🌊 <strong>River Banks</strong> — slippery</span
+            >
+            <span class="vchip"
+              >4. 🏛️ <strong>Ancient Ruins</strong> — rocks fly</span
+            >
+            <span class="vchip"
+              >5. 🍄 <strong>Mushroom Grove</strong> — pace picks up</span
+            >
+            <span class="vchip"
+              >6. 💎 <strong>Crystal Cave</strong> — dark &amp; fast</span
+            >
+            <span class="vchip"
+              >7. 🌋 <strong>Volcano Edge</strong> — fire &amp; lava</span
+            >
+            <span class="vchip"
+              >8. 🌙 <strong>Moonlit Path</strong> — almost there</span
+            >
+            <span class="vchip"
+              >9. ⚡ <strong>Storm Valley</strong> — final stretch</span
+            >
+            <span class="vchip"
+              >10. 🧸 <strong>THE PLUSHIE!!!</strong> — emotional finish</span
+            >
+          </div>
+          <p style="margin-top: 12px">
+            Music changes every level. Speed increases from level 5 onwards. Dev
+            mode: press <strong>L</strong> during gameplay.
+          </p>
+        </div>
+      </div>
+
+      <div class="about-cta">
+        <a href="game.html" class="btn btn-primary">Play Now 🐒</a>
+        <a href="index.html" class="btn btn-ghost">← Home</a>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      made with ❤️
+      <a href="https://github.com/alton47" target="_blank">Allan</a>
+    </footer>
+
+    <script src="game.js"></script>
+    <script>
+      // Build control grid based on device type
+      (function () {
+        const touch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+        const isMobile = window.innerWidth < 700 || touch;
+
+        const desktop = [
+          { k: "SPACE / ↑ / W", d: "Jump (double-press = double jump!)" },
+          { k: "↓ / S", d: "Slide — duck under vines & swingers" },
+          { k: "Hold →", d: "Speed burst!" },
+          { k: "P / ESC", d: "Pause → 3-2-1 countdown resume" },
+          { k: "L key", d: "🔧 Dev mode" },
+        ];
+        const mobile = [
+          { k: "Tap / Swipe ↑", d: "Jump (tap twice = double jump!)" },
+          { k: "Swipe ↓", d: "Slide — duck vines & swingers" },
+          { k: "Swipe →", d: "Speed burst!" },
+          { k: "↑ button", d: "On-screen jump button" },
+          { k: "↓ button", d: "On-screen slide button" },
+        ];
+
+        const grid = document.getElementById("ctrl-grid");
+        const list = isMobile ? mobile : desktop;
+        grid.innerHTML = list
+          .map(
+            (c) =>
+              `<div class="ctrl-card">
+       <div class="ctrl-key">${c.k}</div>
+       <div class="ctrl-desc">${c.d}</div>
+     </div>`,
+          )
+          .join("");
+      })();
+    </script>
+  </body>
+</html>
