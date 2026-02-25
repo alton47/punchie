@@ -1,0 +1,484 @@
+/*
+ * ═══════════════════════════════════════════════════════════════
+ *  PUNCH'S GREAT ESCAPE — Global Stylesheet
+ *  Mobile-first. True fullscreen on all devices.
+ *  No fixed widths. No weird borders.
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+/* ── Design tokens ─────────────────────────────────────── */
+:root {
+  --orange: #ff6b35;
+  --orange-d: #c23b0a;
+  --yellow: #ffd166;
+  --teal: #06d6a0;
+  --red: #ff4d6d;
+  --violet: #a78bfa;
+  --bg: #080215;
+  --bg2: #120630;
+  --surface: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.1);
+  --text: rgba(255, 255, 255, 0.85);
+  --text-dim: rgba(255, 255, 255, 0.4);
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-pill: 50px;
+
+  /* Font sizes — fluid clamp for every screen */
+  --fs-xs: clamp(10px, 1.8vw, 13px);
+  --fs-sm: clamp(12px, 2.2vw, 15px);
+  --fs-md: clamp(14px, 2.6vw, 18px);
+  --fs-lg: clamp(18px, 3.5vw, 26px);
+  --fs-xl: clamp(26px, 5.5vw, 46px);
+  --fs-2xl: clamp(36px, 7.5vw, 72px);
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Boogaloo", cursive;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh; /* dvh for mobile safari */
+  width: 100%;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* ── Links ───────────────────────────────────────────────── */
+a {
+  color: var(--teal);
+  text-decoration: none;
+}
+a:hover {
+  opacity: 0.8;
+}
+
+/* ── Shared layout ───────────────────────────────────────── */
+
+/* Full-viewport hero used on landing + about */
+.page-hero {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% 110%,
+      rgba(255, 107, 53, 0.18) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 20% 20%,
+      rgba(167, 139, 250, 0.1) 0%,
+      transparent 60%
+    ),
+    linear-gradient(160deg, #080215 0%, #120630 60%, #1d0b45 100%);
+  overflow: hidden;
+}
+
+/* Animated background particles (canvas overlay) */
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(
+      1.5px 1.5px at 12% 28%,
+      rgba(255, 255, 255, 0.45) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 38% 14%,
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1.5px 1.5px at 62% 8%,
+      rgba(255, 255, 255, 0.5) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 82% 32%,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 24% 68%,
+      rgba(255, 255, 255, 0.25) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1.5px 1.5px at 72% 72%,
+      rgba(255, 255, 255, 0.4) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 44% 88%,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      1px 1px at 90% 55%,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 100%
+    );
+  pointer-events: none;
+  z-index: 0;
+  animation: starTwinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes starTwinkle {
+  0% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Content must sit above ::before star layer */
+.page-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Nav bar (shared top bar) ─────────────────────────────── */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: rgba(8, 2, 21, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  z-index: 100;
+  gap: 10px;
+}
+
+.nav-logo {
+  font-size: var(--fs-md);
+  color: var(--orange);
+  font-weight: 700;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  cursor: pointer;
+  font-family: "Boogaloo", cursive;
+  letter-spacing: 0.5px;
+  border-radius: var(--r-pill);
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s,
+    opacity 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active {
+  transform: translateY(2px);
+}
+.btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background: var(--orange);
+  color: #fff;
+  font-size: var(--fs-lg);
+  padding: 14px 40px;
+  box-shadow:
+    0 5px 0 var(--orange-d),
+    0 0 32px rgba(255, 107, 53, 0.4);
+}
+.btn-primary:active {
+  box-shadow: 0 2px 0 var(--orange-d);
+}
+
+.btn-sm {
+  font-size: var(--fs-xs);
+  padding: 5px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+}
+.btn-sm:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.btn-teal {
+  background: var(--teal);
+  color: #0a1f18;
+  font-size: var(--fs-md);
+  padding: 11px 28px;
+  box-shadow: 0 4px 0 #028a66;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+  padding: 8px 20px;
+}
+.btn-ghost:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.btn-red {
+  background: var(--red);
+  color: #fff;
+  font-size: var(--fs-md);
+  padding: 11px 28px;
+  box-shadow: 0 4px 0 #a01030;
+}
+
+.btn-share {
+  background: linear-gradient(135deg, var(--orange), var(--red));
+  color: #fff;
+  font-size: var(--fs-md);
+  padding: 11px 28px;
+  box-shadow: 0 4px 0 #a01030;
+}
+
+.btn-mute {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.btn-mute:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Card surface ────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+}
+
+/* ── Typography helpers ──────────────────────────────────── */
+.title-xl {
+  font-size: var(--fs-2xl);
+  color: var(--orange);
+  text-shadow:
+    4px 4px 0 var(--orange-d),
+    0 0 50px rgba(255, 107, 53, 0.35);
+  line-height: 1;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: var(--fs-sm);
+  color: var(--yellow);
+  letter-spacing: 3px;
+  text-align: center;
+}
+
+.body-text {
+  font-family: "Nunito", sans-serif;
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* ── Stat box ───────────────────────────────────────────── */
+.stat-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 18px;
+  text-align: center;
+  min-width: 72px;
+}
+.stat-box .sv {
+  font-size: var(--fs-lg);
+  color: var(--yellow);
+}
+.stat-box .sl {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  font-family: "Nunito", sans-serif;
+}
+
+/* ── Utilities ───────────────────────────────────────────── */
+.text-center {
+  text-align: center;
+}
+.text-teal {
+  color: var(--teal);
+}
+.text-yellow {
+  color: var(--yellow);
+}
+.text-dim {
+  color: var(--text-dim);
+}
+.gap-sm {
+  gap: 8px;
+}
+.gap-md {
+  gap: 14px;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.w-full {
+  width: 100%;
+}
+.hidden {
+  display: none !important;
+}
+
+/* Heart glow ─────────────────────────────────────────────── */
+.heart-glow {
+  filter: drop-shadow(0 0 6px rgba(255, 77, 109, 0.9));
+  animation: heartPulse 1.4s ease-in-out infinite;
+}
+@keyframes heartPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(255, 77, 109, 0.7));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(255, 77, 109, 1));
+  }
+}
+
+/* Trophy glow ─────────────────────────────────────────────── */
+.trophy-glow {
+  filter: drop-shadow(0 0 8px rgba(255, 209, 102, 0.9));
+  animation: trophyGlow 2s ease-in-out infinite;
+}
+@keyframes trophyGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(255, 209, 102, 0.7));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(255, 209, 102, 1));
+  }
+}
+
+/* Fade in animation ─────────────────────────────────────── */
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.page-footer {
+  position: fixed;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  font-family: "Nunito", sans-serif;
+  pointer-events: none;
+  z-index: 5;
+}
+.page-footer a {
+  color: rgba(255, 255, 255, 0.35);
+  pointer-events: all;
+}
+.page-footer a:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Responsive breakpoints ─────────────────────────────── */
+
+/* Tablet ≥ 600px */
+@media (min-width: 600px) {
+  .top-nav {
+    padding: 14px 32px;
+  }
+  .btn-primary {
+    font-size: var(--fs-xl);
+    padding: 16px 56px;
+  }
+}
+
+/* Desktop ≥ 1024px */
+@media (min-width: 1024px) {
+  .top-nav {
+    padding: 16px 48px;
+  }
+}
