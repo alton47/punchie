@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!--
+  ╔══════════════════════════════════════════════╗
+  ║  PUNCH'S GREAT ESCAPE — Game                ║
+  ║  Canvas fills 100% of the viewport.         ║
+  ╚══════════════════════════════════════════════╝
+-->
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Play — Punch's Great Escape 🐒</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='58' r='34' fill='%23c47a2e'/><circle cx='50' cy='46' r='26' fill='%23c47a2e'/><ellipse cx='50' cy='52' rx='18' ry='16' fill='%23e8a96a'/><circle cx='43' cy='41' r='4.5' fill='%231a0a2e'/><circle cx='57' cy='41' r='4.5' fill='%231a0a2e'/><circle cx='38' cy='60' r='3.5' fill='%23ff4d6d'/></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* ══════════════════════════════════════════════════════
+   GAME PAGE
+   ──────────────────────────────────────────────────────
+   The canvas fills 100vw × 100dvh — NO borders, NO gaps.
+   All UI overlays are position:fixed or position:absolute
+   inside #game-wrap which also fills 100%.
+   ══════════════════════════════════════════════════════ */
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #050115;
+        touch-action: none;
+      }
+
+      /* Full-screen wrapper */
+      #game-wrap {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* Canvas: fills entire screen, renders at native resolution */
+      #cv {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        touch-action: none;
+        cursor: none;
+      }
+
+      /* ── HUD strip at top ─────────────────────────────────── */
+      #hud {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: none;
+        align-items: center;
+        gap: clamp(5px, 1vw, 10px);
+        padding: clamp(6px, 1.2vh, 10px) clamp(10px, 2vw, 18px);
+        background: rgba(5, 1, 15, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 80;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      #hud.visible {
+        display: flex;
+      }
+
+      #hud-hearts {
+        font-size: clamp(13px, 2.5vw, 20px);
+        white-space: nowrap;
+        flex-shrink: 0;
+        filter: drop-shadow(0 0 5px rgba(255, 77, 109, 0.8));
+      }
+      #hud-level {
+        font-size: clamp(10px, 1.8vw, 14px);
+        color: var(--teal);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      #hud-prog-wrap {
+        flex: 1;
+        height: 6px;
+        min-width: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      #hud-prog {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--teal), var(--yellow));
+        border-radius: 3px;
+        transition: width 0.25s;
+      }
+      #hud-gems {
+        font-size: clamp(10px, 1.7vw, 13px);
+        color: var(--violet);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      #hud-score {
+        font-size: clamp(10px, 1.8vw, 14px);
+        color: var(--yellow);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      #hud-pause {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        font-size: clamp(11px, 1.8vw, 15px);
+        cursor: pointer;
+        border-radius: var(--r-sm);
+        padding: 3px 9px;
+        font-family: "Boogaloo", cursive;
+        flex-shrink: 0;
+      }
+
+      /* Top-right quick buttons (mute + coffee) */
+      #top-right {
+        position: fixed;
+        top: clamp(38px, 7vh, 54px);
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        z-index: 90;
+      }
+      #coffee-hud {
+        background: rgba(255, 213, 79, 0.1);
+        border: 1px solid rgba(255, 213, 79, 0.3);
+        color: var(--yellow);
+        font-size: clamp(9px, 1.5vw, 11px);
+        font-family: "Boogaloo", cursive;
+        border-radius: var(--r-pill);
+        padding: 4px 12px;
+        text-decoration: none;
+        transition: background 0.2s;
+        white-space: nowrap;
+      }
+      #coffee-hud:hover {
+        background: rgba(255, 213, 79, 0.22);
+      }
+      #mute-hud {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+
+      /* Immunity banner */
+      #immuno-badge {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #7c3aed, #c084fc);
+        color: white;
+        padding: 2px 14px;
+        font-size: clamp(11px, 1.8vw, 13px);
+        border-radius: 0 0 12px 12px;
+        display: none;
+        box-shadow: 0 4px 20px rgba(192, 132, 252, 0.6);
+        z-index: 85;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      /* Dev badge */
+      #dev-badge {
+        position: fixed;
+        top: clamp(38px, 7vh, 54px);
+        left: 10px;
+        background: rgba(255, 77, 109, 0.15);
+        border: 1px solid rgba(255, 77, 109, 0.4);
+        color: var(--red);
+        padding: 3px 10px;
+        font-size: 11px;
+        font-family: "Nunito", sans-serif;
+        border-radius: 8px;
+        z-index: 90;
+        display: none;
+      }
+      #dev-badge.visible {
+        display: block;
+      }
+
+      /* Magnet badge */
+      #magnet-badge {
+        position: fixed;
+        top: 0;
+        right: 50%;
+        transform: translateX(50%);
+        background: linear-gradient(90deg, #db2777, #f472b6);
+        color: white;
+        padding: 2px 12px;
+        font-size: clamp(11px, 1.8vw, 13px);
+        border-radius: 0 0 10px 10px;
+        display: none;
+        z-index: 84;
+        pointer-events: none;
+      }
+
+      /* ── SCREENS ─────────────────────────────────────────── */
+      /* All screens are fixed, covering the entire viewport */
+      .scr {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        gap: 12px;
+        overflow-y: auto;
+        z-index: 70;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 50% 110%,
+            rgba(255, 107, 53, 0.16) 0%,
+            transparent 65%
+          ),
+          linear-gradient(160deg, #080215 0%, #120630 55%, #1d0b45 100%);
+      }
+      .scr.active {
+        display: flex;
+      }
+
+      /* ── Pause overlay ── */
+      #scr-pause {
+        background: rgba(4, 1, 14, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        gap: 16px;
+      }
+      #scr-pause h2 {
+        font-size: clamp(32px, 8vw, 60px);
+        color: var(--yellow);
+      }
+      #scr-pause p {
+        color: var(--text-dim);
+        font-family: "Nunito", sans-serif;
+        font-size: var(--fs-sm);
+        text-align: center;
+      }
+      #countdown {
+        font-size: clamp(72px, 18vw, 120px);
+        color: var(--orange);
+        text-shadow: 0 0 50px rgba(255, 107, 53, 0.7);
+        display: none;
+        line-height: 1;
+      }
+
+      /* ── Level toast ── */
+      #level-toast {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.88);
+        border: 2px solid var(--yellow);
+        border-radius: var(--r-md);
+        padding: 20px 40px;
+        text-align: center;
+        z-index: 95;
+        pointer-events: none;
+        display: none;
+        backdrop-filter: blur(16px);
+        min-width: clamp(200px, 50vw, 420px);
+      }
+      #toast-lvl {
+        font-size: clamp(44px, 10vw, 72px);
+        color: var(--yellow);
+        line-height: 1;
+      }
+      #toast-name {
+        font-size: clamp(16px, 3.5vw, 26px);
+        color: rgba(255, 255, 255, 0.9);
+        font-family: "Nunito", sans-serif;
+      }
+      #toast-desc {
+        font-size: clamp(12px, 2vw, 16px);
+        color: var(--teal);
+        margin-top: 4px;
+      }
+      #toast-music {
+        font-size: clamp(10px, 1.8vw, 13px);
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 4px;
+        font-family: "Nunito", sans-serif;
+        font-style: italic;
+      }
+
+      /* ── TUTORIAL ── */
+      #tutorial-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(4px);
+        z-index: 92;
+        pointer-events: none;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: clamp(60px, 12vw, 100px);
+      }
+      #tutorial-overlay.visible {
+        display: flex;
+      }
+
+      #tut-box {
+        background: rgba(0, 0, 0, 0.9);
+        border: 2px solid var(--orange);
+        border-radius: var(--r-lg);
+        padding: clamp(16px, 3vw, 28px) clamp(20px, 4vw, 40px);
+        text-align: center;
+        max-width: min(500px, 90vw);
+        animation: tutSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow:
+          0 0 40px rgba(255, 107, 53, 0.3),
+          0 20px 60px rgba(0, 0, 0, 0.6);
+      }
+
+      @keyframes tutSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px) scale(0.92);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* Flashing arrow pointing at upcoming obstacle */
+      #tut-arrow {
+        position: fixed;
+        z-index: 93;
+        font-size: clamp(24px, 5vw, 38px);
+        pointer-events: none;
+        display: none;
+        animation: arrowBounce 0.5s ease-in-out infinite alternate;
+        filter: drop-shadow(0 0 8px var(--orange));
+      }
+      @keyframes arrowBounce {
+        from {
+          transform: translateX(-50%) translateY(0);
+        }
+        to {
+          transform: translateX(-50%) translateY(-10px);
+        }
+      }
+
+      #tut-icon {
+        font-size: clamp(30px, 6vw, 48px);
+        display: block;
+        margin-bottom: 6px;
+      }
+      #tut-title {
+        font-size: clamp(18px, 3.5vw, 28px);
+        color: var(--orange);
+        margin-bottom: 6px;
+      }
+      #tut-body {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(13px, 2.2vw, 16px);
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.6;
+        margin-bottom: 8px;
+      }
+      #tut-key {
+        display: inline-block;
+        background: rgba(255, 209, 102, 0.12);
+        border: 1px solid rgba(255, 209, 102, 0.35);
+        border-radius: 8px;
+        padding: 5px 16px;
+        font-size: clamp(12px, 2vw, 15px);
+        color: var(--yellow);
+        font-family: "Boogaloo", cursive;
+      }
+      #tut-tap {
+        display: none;
+        color: var(--teal);
+        margin-top: 6px;
+        font-size: clamp(11px, 1.9vw, 14px);
+        font-family: "Nunito", sans-serif;
+      }
+
+      /* ── Gem pop banner ── */
+      #gem-banner {
+        position: fixed;
+        top: clamp(45px, 9vh, 68px);
+        left: 50%;
+        transform: translateX(-50%);
+        color: #1a0a2e;
+        padding: 7px 22px;
+        border-radius: var(--r-pill);
+        font-size: clamp(12px, 2vw, 15px);
+        font-family: "Nunito", sans-serif;
+        font-weight: 700;
+        z-index: 88;
+        pointer-events: none;
+        display: none;
+        white-space: nowrap;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+      }
+      #gem-banner.pop {
+        display: block;
+        animation: gemFlyIn 2.8s ease forwards;
+      }
+      @keyframes gemFlyIn {
+        0% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-20px) scale(0.5);
+        }
+        15% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0) scale(1.1);
+        }
+        25% {
+          transform: translateX(-50%) scale(1);
+        }
+        78% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-15px) scale(0.85);
+        }
+      }
+
+      /* ── Mobile controls ── */
+      #mob-ctrl {
+        position: fixed;
+        bottom: clamp(8px, 3vh, 22px);
+        left: 0;
+        right: 0;
+        display: none;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 0 clamp(12px, 4vw, 30px);
+        z-index: 82;
+        pointer-events: none;
+      }
+      #mob-ctrl.visible {
+        display: flex;
+      }
+
+      .mob-btn {
+        width: clamp(58px, 15vw, 80px);
+        height: clamp(58px, 15vw, 80px);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(24px, 6vw, 34px);
+        pointer-events: all;
+        cursor: pointer;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        transition:
+          background 0.1s,
+          transform 0.08s;
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        user-select: none;
+      }
+      .mob-btn:active {
+        background: rgba(255, 255, 255, 0.26);
+        transform: scale(0.86);
+      }
+
+      /* Score floaters */
+      .score-pop {
+        position: fixed;
+        pointer-events: none;
+        font-family: "Boogaloo", cursive;
+        font-size: clamp(13px, 2.5vw, 18px);
+        z-index: 77;
+        animation: floatUp 0.9s ease-out forwards;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+      }
+      @keyframes floatUp {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-60px) scale(1.4);
+        }
+      }
+
+      /* ── Game-over screen ── */
+      #fail-title {
+        font-size: clamp(26px, 6vw, 52px);
+        line-height: 1.1;
+        text-align: center;
+      }
+      .fail-msg {
+        font-size: var(--fs-sm);
+        color: rgba(255, 200, 100, 0.9);
+        text-align: center;
+        font-family: "Nunito", sans-serif;
+        max-width: 380px;
+      }
+
+      /* ── Win screen ── */
+      #win-canvas {
+        border-radius: var(--r-md);
+        background: #050218;
+        flex-shrink: 0;
+        display: block;
+      }
+      .win-story {
+        font-family: "Nunito", sans-serif;
+        font-size: var(--fs-sm);
+        color: rgba(255, 255, 255, 0.85);
+        text-align: center;
+        max-width: 420px;
+        line-height: 1.75;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-wrap">
+      <!-- ═══════════════ CANVAS ═══════════════ -->
+      <canvas id="cv"></canvas>
+
+      <!-- ═══════════════ HUD ═══════════════ -->
+      <div id="hud">
+        <span id="hud-hearts">❤️❤️❤️</span>
+        <span id="hud-level">LVL 1</span>
+        <div id="hud-prog-wrap"><div id="hud-prog"></div></div>
+        <span id="hud-gems">💎 0</span>
+        <span id="hud-score">0</span>
+        <button id="hud-pause" onclick="togglePause()">⏸</button>
+      </div>
+
+      <!-- Persistent top-right (mute + coffee) — visible always -->
+      <div id="top-right">
+        <a
+          id="coffee-hud"
+          href="https://buymeacoffee.com/allanito"
+          target="_blank"
+          onclick="onCoffeeClick(event)"
+          >☕ Coffee</a
+        >
+        <button id="mute-hud" onclick="PunchAudio.toggleMute()">🔊</button>
+      </div>
+
+      <div id="immuno-badge">🛡️ IMMUNE</div>
+      <div id="magnet-badge">🧲 MAGNET ACTIVE</div>
+      <div id="dev-badge">🔧 DEV MODE</div>
+
+      <!-- ═══════════════ TUTORIAL ═══════════════ -->
+      <div id="tutorial-overlay">
+        <div id="tut-box">
+          <span id="tut-icon">⬆️</span>
+          <div id="tut-title">Watch out!</div>
+          <div id="tut-body">An obstacle is coming!</div>
+          <div id="tut-key">SPACE / ↑ / W — double for double jump!</div>
+          <div id="tut-tap">Tap screen or tap ↑ button</div>
+        </div>
+      </div>
+      <div id="tut-arrow">⬆️</div>
+
+      <!-- ═══════════════ LEVEL TOAST ═══════════════ -->
+      <div id="level-toast">
+        <div id="toast-lvl">LEVEL 1</div>
+        <div id="toast-name">🏛️ Monkey Zoo</div>
+        <div id="toast-desc">Welcome to the chaos!</div>
+        <div id="toast-music"></div>
+      </div>
+
+      <!-- ═══════════════ GEM BANNER ═══════════════ -->
+      <div id="gem-banner"></div>
+
+      <!-- ═══════════════ MOBILE CONTROLS ═══════════════ -->
+      <div id="mob-ctrl">
+        <div
+          class="mob-btn"
+          id="mob-slide"
+          ontouchstart="event.preventDefault();mobileSlide(true)"
+          ontouchend="event.preventDefault();mobileSlide(false)"
+        >
+          ↓
+        </div>
+        <div
+          class="mob-btn"
+          id="mob-jump"
+          ontouchstart="event.preventDefault();mobileJump()"
+        >
+          ↑
+        </div>
+      </div>
+
+      <!-- ═══════════════ SCREENS ═══════════════ -->
+
+      <!-- PAUSE -->
+      <div id="scr-pause" class="scr">
+        <h2>⏸ PAUSED</h2>
+        <p id="pause-sub">Press P / ESC to resume</p>
+        <div id="countdown"></div>
+        <div
+          class="btn-row"
+          style="
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+          "
+        >
+          <button class="btn btn-primary" onclick="resumeGame()">
+            ▶ Resume
+          </button>
+          <a
+            href="index.html"
+            class="btn btn-ghost"
+            onclick="PunchGame.cleanUp()"
+            >Main Menu</a
+          >
+        </div>
+      </div>
+
+      <!-- GAME OVER -->
+      <div id="scr-over" class="scr">
+        <h2 id="fail-title">💀 GOT CAUGHT</h2>
+        <p class="fail-msg" id="fail-msg">The gang caught up…</p>
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="sv" id="go-score">0</div>
+            <div class="sl">Score</div>
+          </div>
+          <div class="stat-box">
+            <div class="sv" id="go-level">1</div>
+            <div class="sl">Level</div>
+          </div>
+          <div class="stat-box">
+            <div class="sv" id="go-best">0</div>
+            <div class="sl">Best</div>
+          </div>
+          <div class="stat-box">
+            <div class="sv" id="go-maxlv">1</div>
+            <div class="sl">Max LV</div>
+          </div>
+        </div>
+        <div
+          id="go-gems-info"
+          style="
+            font-size: var(--fs-xs);
+            color: rgba(200, 180, 255, 0.8);
+            font-family: Nunito, sans-serif;
+            text-align: center;
+          "
+        ></div>
+        <div
+          id="continue-info"
+          style="
+            font-size: var(--fs-xs);
+            color: var(--text-dim);
+            font-family: Nunito, sans-serif;
+            text-align: center;
+          "
+        ></div>
+        <div
+          style="
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+            justify-content: center;
+          "
+        >
+          <button
+            class="btn btn-teal"
+            id="cont-btn"
+            onclick="PunchGame.continueRun()"
+          >
+            Continue ❤️
+          </button>
+          <button class="btn btn-red" onclick="PunchGame.restart()">
+            Restart 🔄
+          </button>
+          <button class="btn btn-share" onclick="PunchGame.share('over')">
+            📤 Share
+          </button>
+        </div>
+        <a href="index.html" class="btn btn-ghost" onclick="PunchGame.cleanUp()"
+          >Main Menu</a
+        >
+      </div>
+
+      <!-- WIN -->
+      <div id="scr-win" class="scr">
+        <h2
+          style="
+            font-size: clamp(22px, 5.5vw, 48px);
+            color: var(--teal);
+            text-shadow: 2px 2px 0 #028a66;
+            text-align: center;
+          "
+        >
+          🧸 PLUSHIE RECLAIMED!
+        </h2>
+        <canvas id="win-canvas" width="340" height="160"></canvas>
+        <p class="win-story">
+          Punch ran through jungles, storms, lava and chaos…<br />
+          and he finally made it home. He curled up with the plushie.<br />
+          <strong style="color: var(--yellow)">Finally at peace. 💛</strong>
+        </p>
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="sv" id="win-score">0</div>
+            <div class="sl">Score</div>
+          </div>
+          <div class="stat-box">
+            <div class="sv" id="win-time">0s</div>
+            <div class="sl">Time</div>
+          </div>
+          <div class="stat-box">
+            <div class="sv" id="win-gems">0</div>
+            <div class="sl">Gems</div>
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+            justify-content: center;
+          "
+        >
+          <button class="btn btn-share" onclick="PunchGame.share('win')">
+            📤 Share Victory!
+          </button>
+          <button class="btn btn-primary" onclick="PunchGame.restart()">
+            Play Again 🐒
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- /game-wrap -->
+
+    <script src="game.js"></script>
+    <script>
+      // Auto-start when page loads
+      window.addEventListener("load", () => PunchGame.init());
+
+      function togglePause() {
+        PunchGame.togglePause();
+      }
+      function resumeGame() {
+        PunchGame.resume();
+      }
+      function onCoffeeClick(e) {
+        if (PunchGame && PunchGame.state === "playing") PunchGame.autoPause();
+      }
+      function mobileJump() {
+        PunchAudio.wake();
+        PunchGame.doJump();
+      }
+      function mobileSlide(active) {
+        PunchGame.setSlide(active);
+      }
+    </script>
+  </body>
+</html>
