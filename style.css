@@ -319,11 +319,12 @@ a:hover {
 .title-xl {
   font-size: var(--fs-2xl);
   color: var(--orange);
+  /* shadow offsets scale with font size using em units */
   text-shadow:
-    4px 4px 0 var(--orange-d),
-    0 0 50px rgba(255, 107, 53, 0.35);
+    0.08em 0.08em 0 var(--orange-d),
+    0 0 0.8em rgba(255, 107, 53, 0.35);
   line-height: 1;
-  letter-spacing: 2px;
+  letter-spacing: clamp(0px, 0.5vw, 2px);
   text-align: center;
 }
 
