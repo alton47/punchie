@@ -1,12 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!--
-  ╔══════════════════════════════════════════════╗
-  ║  PUNCH'S GREAT ESCAPE — Game                ║
-  ║  Canvas fills 100% of the viewport.         ║
-  ╚══════════════════════════════════════════════╝
--->
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -24,14 +18,6 @@
     />
     <link rel="stylesheet" href="style.css" />
     <style>
-      /* ══════════════════════════════════════════════════════
-   GAME PAGE
-   ──────────────────────────────────────────────────────
-   The canvas fills 100vw × 100dvh — NO borders, NO gaps.
-   All UI overlays are position:fixed or position:absolute
-   inside #game-wrap which also fills 100%.
-   ══════════════════════════════════════════════════════ */
-
       html,
       body {
         width: 100%;
@@ -40,8 +26,6 @@
         background: #050115;
         touch-action: none;
       }
-
-      /* Full-screen wrapper */
       #game-wrap {
         position: fixed;
         inset: 0;
@@ -49,8 +33,6 @@
         height: 100%;
         overflow: hidden;
       }
-
-      /* Canvas: fills entire screen, renders at native resolution */
       #cv {
         position: absolute;
         inset: 0;
@@ -58,10 +40,9 @@
         height: 100%;
         display: block;
         touch-action: none;
-        cursor: none;
       }
 
-      /* ── HUD strip at top ─────────────────────────────────── */
+      /* ── HUD ── */
       #hud {
         position: fixed;
         top: 0;
@@ -69,9 +50,9 @@
         right: 0;
         display: none;
         align-items: center;
-        gap: clamp(5px, 1vw, 10px);
-        padding: clamp(6px, 1.2vh, 10px) clamp(10px, 2vw, 18px);
-        background: rgba(5, 1, 15, 0.7);
+        gap: clamp(4px, 0.8vw, 10px);
+        padding: clamp(5px, 1vh, 9px) clamp(8px, 2vw, 16px);
+        background: rgba(5, 1, 15, 0.75);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         z-index: 80;
@@ -80,23 +61,22 @@
       #hud.visible {
         display: flex;
       }
-
       #hud-hearts {
-        font-size: clamp(13px, 2.5vw, 20px);
+        font-size: clamp(12px, 2.2vw, 20px);
         white-space: nowrap;
         flex-shrink: 0;
-        filter: drop-shadow(0 0 5px rgba(255, 77, 109, 0.8));
+        filter: drop-shadow(0 0 4px rgba(255, 77, 109, 0.8));
       }
       #hud-level {
-        font-size: clamp(10px, 1.8vw, 14px);
+        font-size: clamp(9px, 1.6vw, 13px);
         color: var(--teal);
         white-space: nowrap;
         flex-shrink: 0;
       }
       #hud-prog-wrap {
         flex: 1;
-        height: 6px;
-        min-width: 30px;
+        height: 5px;
+        min-width: 24px;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 3px;
         overflow: hidden;
@@ -109,13 +89,13 @@
         transition: width 0.25s;
       }
       #hud-gems {
-        font-size: clamp(10px, 1.7vw, 13px);
+        font-size: clamp(9px, 1.5vw, 12px);
         color: var(--violet);
         white-space: nowrap;
         flex-shrink: 0;
       }
       #hud-score {
-        font-size: clamp(10px, 1.8vw, 14px);
+        font-size: clamp(9px, 1.6vw, 13px);
         color: var(--yellow);
         white-space: nowrap;
         flex-shrink: 0;
@@ -124,18 +104,18 @@
         background: rgba(255, 255, 255, 0.1);
         border: none;
         color: white;
-        font-size: clamp(11px, 1.8vw, 15px);
+        font-size: clamp(10px, 1.6vw, 14px);
         cursor: pointer;
         border-radius: var(--r-sm);
-        padding: 3px 9px;
+        padding: 3px 8px;
         font-family: "Boogaloo", cursive;
         flex-shrink: 0;
       }
 
-      /* Top-right quick buttons (mute + coffee) */
+      /* ── Top-right: coffee + mute ── */
       #top-right {
         position: fixed;
-        top: clamp(38px, 7vh, 54px);
+        top: clamp(36px, 6.5vh, 52px);
         right: 10px;
         display: flex;
         flex-direction: column;
@@ -147,33 +127,58 @@
         background: rgba(255, 213, 79, 0.1);
         border: 1px solid rgba(255, 213, 79, 0.3);
         color: var(--yellow);
-        font-size: clamp(9px, 1.5vw, 11px);
+        font-size: clamp(8px, 1.3vw, 11px);
         font-family: "Boogaloo", cursive;
         border-radius: var(--r-pill);
-        padding: 4px 12px;
+        padding: 3px 10px;
         text-decoration: none;
-        transition: background 0.2s;
         white-space: nowrap;
       }
       #coffee-hud:hover {
         background: rgba(255, 213, 79, 0.22);
       }
       #mute-hud {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: white;
-        font-size: 14px;
+        font-size: 13px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.2s;
       }
 
-      /* Immunity banner */
+      /* ── Mobile pause — top LEFT, touch only ── */
+      #mob-pause {
+        position: fixed;
+        top: clamp(36px, 6.5vh, 52px);
+        left: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 90;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        -webkit-tap-highlight-color: transparent;
+        pointer-events: all !important;
+        z-index: 95;
+      }
+      #mob-pause.visible {
+        display: flex;
+      }
+
+      /* ── Status badges ── */
       #immuno-badge {
         position: fixed;
         top: 0;
@@ -182,25 +187,36 @@
         background: linear-gradient(90deg, #7c3aed, #c084fc);
         color: white;
         padding: 2px 14px;
-        font-size: clamp(11px, 1.8vw, 13px);
+        font-size: clamp(10px, 1.6vw, 13px);
         border-radius: 0 0 12px 12px;
         display: none;
-        box-shadow: 0 4px 20px rgba(192, 132, 252, 0.6);
         z-index: 85;
         pointer-events: none;
-        white-space: nowrap;
+        box-shadow: 0 4px 20px rgba(192, 132, 252, 0.6);
       }
-
-      /* Dev badge */
+      #magnet-badge {
+        position: fixed;
+        top: 0;
+        right: 50%;
+        transform: translateX(50%);
+        background: linear-gradient(90deg, #db2777, #f472b6);
+        color: white;
+        padding: 2px 12px;
+        font-size: clamp(10px, 1.6vw, 13px);
+        border-radius: 0 0 10px 10px;
+        display: none;
+        z-index: 84;
+        pointer-events: none;
+      }
       #dev-badge {
         position: fixed;
-        top: clamp(38px, 7vh, 54px);
-        left: 10px;
+        top: clamp(36px, 6.5vh, 52px);
+        left: 52px;
         background: rgba(255, 77, 109, 0.15);
         border: 1px solid rgba(255, 77, 109, 0.4);
         color: var(--red);
-        padding: 3px 10px;
-        font-size: 11px;
+        padding: 2px 8px;
+        font-size: 10px;
         font-family: "Nunito", sans-serif;
         border-radius: 8px;
         z-index: 90;
@@ -210,72 +226,90 @@
         display: block;
       }
 
-      /* Magnet badge */
-      #magnet-badge {
+      /* ═══════════════════════════════════════════
+   TUTORIAL BAR — slim strip just below HUD.
+   NOT center screen. Just a top notification.
+   ═══════════════════════════════════════════ */
+      #tut-bar {
         position: fixed;
-        top: 0;
-        right: 50%;
-        transform: translateX(50%);
-        background: linear-gradient(90deg, #db2777, #f472b6);
-        color: white;
-        padding: 2px 12px;
-        font-size: clamp(11px, 1.8vw, 13px);
-        border-radius: 0 0 10px 10px;
-        display: none;
-        z-index: 84;
-        pointer-events: none;
-      }
-
-      /* ── SCREENS ─────────────────────────────────────────── */
-      /* All screens are fixed, covering the entire viewport */
-      .scr {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        gap: 12px;
-        overflow-y: auto;
-        z-index: 70;
-        background:
-          radial-gradient(
-            ellipse 80% 60% at 50% 110%,
-            rgba(255, 107, 53, 0.16) 0%,
-            transparent 65%
-          ),
-          linear-gradient(160deg, #080215 0%, #120630 55%, #1d0b45 100%);
-      }
-      .scr.active {
-        display: flex;
-      }
-
-      /* ── Pause overlay ── */
-      #scr-pause {
-        background: rgba(4, 1, 14, 0.92);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        gap: 16px;
-      }
-      #scr-pause h2 {
-        font-size: clamp(32px, 8vw, 60px);
-        color: var(--yellow);
-      }
-      #scr-pause p {
-        color: var(--text-dim);
-        font-family: "Nunito", sans-serif;
-        font-size: var(--fs-sm);
+        top: clamp(36px, 6.5vh, 52px); /* sits right below HUD */
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: min(520px, 88vw);
+        width: max-content;
+        background: rgba(6, 2, 20, 0.94);
+        border: 2px solid var(--orange);
+        border-radius: var(--r-lg);
+        padding: clamp(8px, 1.5vh, 14px) clamp(12px, 3vw, 24px);
         text-align: center;
-      }
-      #countdown {
-        font-size: clamp(72px, 18vw, 120px);
-        color: var(--orange);
-        text-shadow: 0 0 50px rgba(255, 107, 53, 0.7);
+        z-index: 92;
+        pointer-events: none;
         display: none;
-        line-height: 1;
+        animation: tutSlideDown 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow:
+          0 0 30px rgba(255, 107, 53, 0.35),
+          0 8px 32px rgba(0, 0, 0, 0.6);
+      }
+      #tut-bar.visible {
+        display: block;
+      }
+
+      @keyframes tutSlideDown {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-16px) scale(0.94);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0) scale(1);
+        }
+      }
+
+      #tut-bar-icon {
+        font-size: clamp(18px, 3.5vw, 28px);
+        display: block;
+        line-height: 1.1;
+      }
+      #tut-bar-text {
+        font-family: "Nunito", sans-serif;
+        font-size: clamp(12px, 2vw, 15px);
+        color: rgba(255, 255, 255, 0.92);
+        line-height: 1.4;
+        display: block;
+        margin: 2px 0;
+      }
+      #tut-bar-key {
+        display: inline-block;
+        background: rgba(255, 209, 102, 0.14);
+        border: 1px solid rgba(255, 209, 102, 0.4);
+        border-radius: 6px;
+        padding: 2px 10px;
+        font-size: clamp(10px, 1.6vw, 13px);
+        color: var(--yellow);
+        font-family: "Boogaloo", cursive;
+        margin-top: 3px;
+      }
+
+      /* Tutorial arrow — animated, points at obstacle */
+      #tut-arrow {
+        position: fixed;
+        z-index: 93;
+        font-size: clamp(28px, 6vw, 46px);
+        pointer-events: none;
+        display: none;
+        filter: drop-shadow(0 0 10px var(--orange));
+        animation: arrowPulse 0.45s ease-in-out infinite alternate;
+        transform-origin: center bottom;
+      }
+      @keyframes arrowPulse {
+        from {
+          transform: translateX(-50%) translateY(0) scale(1);
+          opacity: 0.9;
+        }
+        to {
+          transform: translateX(-50%) translateY(-14px) scale(1.18);
+          opacity: 1;
+        }
       }
 
       /* ── Level toast ── */
@@ -284,145 +318,50 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.88);
+        background: rgba(0, 0, 0, 0.9);
         border: 2px solid var(--yellow);
         border-radius: var(--r-md);
-        padding: 20px 40px;
+        padding: 18px 36px;
         text-align: center;
         z-index: 95;
         pointer-events: none;
         display: none;
         backdrop-filter: blur(16px);
-        min-width: clamp(200px, 50vw, 420px);
+        min-width: clamp(180px, 48vw, 400px);
       }
       #toast-lvl {
-        font-size: clamp(44px, 10vw, 72px);
+        font-size: clamp(40px, 9vw, 68px);
         color: var(--yellow);
         line-height: 1;
       }
       #toast-name {
-        font-size: clamp(16px, 3.5vw, 26px);
+        font-size: clamp(14px, 3vw, 24px);
         color: rgba(255, 255, 255, 0.9);
         font-family: "Nunito", sans-serif;
       }
       #toast-desc {
-        font-size: clamp(12px, 2vw, 16px);
+        font-size: clamp(11px, 1.8vw, 15px);
         color: var(--teal);
-        margin-top: 4px;
+        margin-top: 3px;
       }
       #toast-music {
-        font-size: clamp(10px, 1.8vw, 13px);
-        color: rgba(255, 255, 255, 0.4);
-        margin-top: 4px;
+        font-size: clamp(9px, 1.5vw, 12px);
+        color: rgba(255, 255, 255, 0.38);
+        margin-top: 3px;
         font-family: "Nunito", sans-serif;
         font-style: italic;
       }
 
-      /* ── TUTORIAL ── */
-      #tutorial-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.72);
-        backdrop-filter: blur(4px);
-        z-index: 92;
-        pointer-events: none;
-        display: none;
-        align-items: flex-end;
-        justify-content: center;
-        padding-bottom: clamp(60px, 12vw, 100px);
-      }
-      #tutorial-overlay.visible {
-        display: flex;
-      }
-
-      #tut-box {
-        background: rgba(0, 0, 0, 0.9);
-        border: 2px solid var(--orange);
-        border-radius: var(--r-lg);
-        padding: clamp(16px, 3vw, 28px) clamp(20px, 4vw, 40px);
-        text-align: center;
-        max-width: min(500px, 90vw);
-        animation: tutSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow:
-          0 0 40px rgba(255, 107, 53, 0.3),
-          0 20px 60px rgba(0, 0, 0, 0.6);
-      }
-
-      @keyframes tutSlideUp {
-        from {
-          opacity: 0;
-          transform: translateY(40px) scale(0.92);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      /* Flashing arrow pointing at upcoming obstacle */
-      #tut-arrow {
-        position: fixed;
-        z-index: 93;
-        font-size: clamp(24px, 5vw, 38px);
-        pointer-events: none;
-        display: none;
-        animation: arrowBounce 0.5s ease-in-out infinite alternate;
-        filter: drop-shadow(0 0 8px var(--orange));
-      }
-      @keyframes arrowBounce {
-        from {
-          transform: translateX(-50%) translateY(0);
-        }
-        to {
-          transform: translateX(-50%) translateY(-10px);
-        }
-      }
-
-      #tut-icon {
-        font-size: clamp(30px, 6vw, 48px);
-        display: block;
-        margin-bottom: 6px;
-      }
-      #tut-title {
-        font-size: clamp(18px, 3.5vw, 28px);
-        color: var(--orange);
-        margin-bottom: 6px;
-      }
-      #tut-body {
-        font-family: "Nunito", sans-serif;
-        font-size: clamp(13px, 2.2vw, 16px);
-        color: rgba(255, 255, 255, 0.88);
-        line-height: 1.6;
-        margin-bottom: 8px;
-      }
-      #tut-key {
-        display: inline-block;
-        background: rgba(255, 209, 102, 0.12);
-        border: 1px solid rgba(255, 209, 102, 0.35);
-        border-radius: 8px;
-        padding: 5px 16px;
-        font-size: clamp(12px, 2vw, 15px);
-        color: var(--yellow);
-        font-family: "Boogaloo", cursive;
-      }
-      #tut-tap {
-        display: none;
-        color: var(--teal);
-        margin-top: 6px;
-        font-size: clamp(11px, 1.9vw, 14px);
-        font-family: "Nunito", sans-serif;
-      }
-
-      /* ── Gem pop banner ── */
+      /* ── Gem banner ── */
       #gem-banner {
         position: fixed;
-        top: clamp(45px, 9vh, 68px);
+        top: clamp(42px, 8vh, 65px);
         left: 50%;
         transform: translateX(-50%);
         color: #1a0a2e;
-        padding: 7px 22px;
+        padding: 6px 20px;
         border-radius: var(--r-pill);
-        font-size: clamp(12px, 2vw, 15px);
+        font-size: clamp(11px, 1.8vw, 14px);
         font-family: "Nunito", sans-serif;
         font-weight: 700;
         z-index: 88;
@@ -456,33 +395,82 @@
         }
       }
 
+      /* ── Screens ── */
+      .scr {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        gap: 10px;
+        overflow-y: auto;
+        z-index: 70;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 50% 110%,
+            rgba(255, 107, 53, 0.16) 0%,
+            transparent 65%
+          ),
+          linear-gradient(160deg, #080215 0%, #120630 55%, #1d0b45 100%);
+      }
+      .scr.active {
+        display: flex;
+      }
+
+      #scr-pause {
+        background: rgba(4, 1, 14, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        gap: 14px;
+      }
+      #scr-pause h2 {
+        font-size: clamp(28px, 7vw, 56px);
+        color: var(--yellow);
+      }
+      #scr-pause p {
+        color: var(--text-dim);
+        font-family: "Nunito", sans-serif;
+        font-size: var(--fs-sm);
+        text-align: center;
+      }
+      #countdown {
+        font-size: clamp(64px, 16vw, 110px);
+        color: var(--orange);
+        text-shadow: 0 0 50px rgba(255, 107, 53, 0.7);
+        display: none;
+        line-height: 1;
+      }
+
       /* ── Mobile controls ── */
       #mob-ctrl {
         position: fixed;
-        bottom: clamp(8px, 3vh, 22px);
+        bottom: clamp(10px, 3vh, 24px);
         left: 0;
         right: 0;
         display: none;
         justify-content: space-between;
         align-items: flex-end;
-        padding: 0 clamp(12px, 4vw, 30px);
+        padding: 0 clamp(14px, 5vw, 36px);
         z-index: 82;
         pointer-events: none;
       }
       #mob-ctrl.visible {
         display: flex;
       }
-
       .mob-btn {
-        width: clamp(58px, 15vw, 80px);
-        height: clamp(58px, 15vw, 80px);
+        width: clamp(60px, 16vw, 82px);
+        height: clamp(60px, 16vw, 82px);
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.12);
+        border: 2px solid rgba(255, 255, 255, 0.24);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: clamp(24px, 6vw, 34px);
+        font-size: clamp(26px, 7vw, 36px);
         pointer-events: all;
         cursor: pointer;
         backdrop-filter: blur(6px);
@@ -495,16 +483,16 @@
         user-select: none;
       }
       .mob-btn:active {
-        background: rgba(255, 255, 255, 0.26);
-        transform: scale(0.86);
+        background: rgba(255, 255, 255, 0.28);
+        transform: scale(0.84);
       }
 
-      /* Score floaters */
+      /* ── Score pops ── */
       .score-pop {
         position: fixed;
         pointer-events: none;
         font-family: "Boogaloo", cursive;
-        font-size: clamp(13px, 2.5vw, 18px);
+        font-size: clamp(12px, 2.2vw, 17px);
         z-index: 77;
         animation: floatUp 0.9s ease-out forwards;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
@@ -520,9 +508,9 @@
         }
       }
 
-      /* ── Game-over screen ── */
+      /* Screen elements */
       #fail-title {
-        font-size: clamp(26px, 6vw, 52px);
+        font-size: clamp(24px, 5.5vw, 50px);
         line-height: 1.1;
         text-align: center;
       }
@@ -531,10 +519,8 @@
         color: rgba(255, 200, 100, 0.9);
         text-align: center;
         font-family: "Nunito", sans-serif;
-        max-width: 380px;
+        max-width: 360px;
       }
-
-      /* ── Win screen ── */
       #win-canvas {
         border-radius: var(--r-md);
         background: #050218;
@@ -546,17 +532,16 @@
         font-size: var(--fs-sm);
         color: rgba(255, 255, 255, 0.85);
         text-align: center;
-        max-width: 420px;
+        max-width: 400px;
         line-height: 1.75;
       }
     </style>
   </head>
   <body>
     <div id="game-wrap">
-      <!-- ═══════════════ CANVAS ═══════════════ -->
       <canvas id="cv"></canvas>
 
-      <!-- ═══════════════ HUD ═══════════════ -->
+      <!-- HUD -->
       <div id="hud">
         <span id="hud-hearts">❤️❤️❤️</span>
         <span id="hud-level">LVL 1</span>
@@ -566,7 +551,7 @@
         <button id="hud-pause" onclick="togglePause()">⏸</button>
       </div>
 
-      <!-- Persistent top-right (mute + coffee) — visible always -->
+      <!-- Top-right: coffee + mute -->
       <div id="top-right">
         <a
           id="coffee-hud"
@@ -578,34 +563,35 @@
         <button id="mute-hud" onclick="PunchAudio.toggleMute()">🔊</button>
       </div>
 
-      <div id="immuno-badge">🛡️ IMMUNE</div>
-      <div id="magnet-badge">🧲 MAGNET ACTIVE</div>
-      <div id="dev-badge">🔧 DEV MODE</div>
+      <!-- Mobile pause button (top-left, touch only) -->
+      <button id="mob-pause" onclick="togglePause()">⏸</button>
 
-      <!-- ═══════════════ TUTORIAL ═══════════════ -->
-      <div id="tutorial-overlay">
-        <div id="tut-box">
-          <span id="tut-icon">⬆️</span>
-          <div id="tut-title">Watch out!</div>
-          <div id="tut-body">An obstacle is coming!</div>
-          <div id="tut-key">SPACE / ↑ / W — double for double jump!</div>
-          <div id="tut-tap">Tap screen or tap ↑ button</div>
-        </div>
+      <!-- Status badges -->
+      <div id="immuno-badge">🛡️ IMMUNE</div>
+      <div id="magnet-badge">🧲 MAGNET</div>
+      <div id="dev-badge">🔧 DEV</div>
+
+      <!-- TUTORIAL — slim top bar (NOT center screen) -->
+      <div id="tut-bar">
+        <span id="tut-bar-icon">⬆️</span>
+        <span id="tut-bar-text">Watch out!</span>
+        <span id="tut-bar-key" style="display: none">SPACE / ↑</span>
       </div>
+      <!-- Animated arrow pointing at the demo obstacle -->
       <div id="tut-arrow">⬆️</div>
 
-      <!-- ═══════════════ LEVEL TOAST ═══════════════ -->
+      <!-- Level toast -->
       <div id="level-toast">
         <div id="toast-lvl">LEVEL 1</div>
         <div id="toast-name">🏛️ Monkey Zoo</div>
-        <div id="toast-desc">Welcome to the chaos!</div>
+        <div id="toast-desc">Follow the tutorial!</div>
         <div id="toast-music"></div>
       </div>
 
-      <!-- ═══════════════ GEM BANNER ═══════════════ -->
+      <!-- Gem pop banner -->
       <div id="gem-banner"></div>
 
-      <!-- ═══════════════ MOBILE CONTROLS ═══════════════ -->
+      <!-- Mobile controls (bottom) -->
       <div id="mob-ctrl">
         <div
           class="mob-btn"
@@ -624,15 +610,12 @@
         </div>
       </div>
 
-      <!-- ═══════════════ SCREENS ═══════════════ -->
-
-      <!-- PAUSE -->
+      <!-- PAUSE screen -->
       <div id="scr-pause" class="scr">
         <h2>⏸ PAUSED</h2>
-        <p id="pause-sub">Press P / ESC to resume</p>
+        <p id="pause-sub">Tap Resume or press P / ESC</p>
         <div id="countdown"></div>
         <div
-          class="btn-row"
           style="
             display: flex;
             gap: 10px;
@@ -652,7 +635,7 @@
         </div>
       </div>
 
-      <!-- GAME OVER -->
+      <!-- GAME OVER screen -->
       <div id="scr-over" class="scr">
         <h2 id="fail-title">💀 GOT CAUGHT</h2>
         <p class="fail-msg" id="fail-msg">The gang caught up…</p>
@@ -695,7 +678,7 @@
         <div
           style="
             display: flex;
-            gap: 9px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
           "
@@ -719,19 +702,19 @@
         >
       </div>
 
-      <!-- WIN -->
+      <!-- WIN screen -->
       <div id="scr-win" class="scr">
         <h2
           style="
-            font-size: clamp(22px, 5.5vw, 48px);
+            font-size: clamp(20px, 5vw, 46px);
             color: var(--teal);
-            text-shadow: 2px 2px 0 #028a66;
+            text-shadow: 0.06em 0.06em 0 #028a66;
             text-align: center;
           "
         >
           🧸 PLUSHIE RECLAIMED!
         </h2>
-        <canvas id="win-canvas" width="340" height="160"></canvas>
+        <canvas id="win-canvas" width="320" height="150"></canvas>
         <p class="win-story">
           Punch ran through jungles, storms, lava and chaos…<br />
           and he finally made it home. He curled up with the plushie.<br />
@@ -754,7 +737,7 @@
         <div
           style="
             display: flex;
-            gap: 9px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
           "
@@ -768,13 +751,10 @@
         </div>
       </div>
     </div>
-    <!-- /game-wrap -->
 
     <script src="game.js"></script>
     <script>
-      // Auto-start when page loads
       window.addEventListener("load", () => PunchGame.init());
-
       function togglePause() {
         PunchGame.togglePause();
       }
