@@ -171,8 +171,6 @@
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
         -webkit-tap-highlight-color: transparent;
-        pointer-events: all !important;
-        z-index: 95;
       }
       #mob-pause.visible {
         display: flex;
@@ -688,10 +686,10 @@
             id="cont-btn"
             onclick="PunchGame.continueRun()"
           >
-            Continue ❤️
+            Try Again 🔄
           </button>
           <button class="btn btn-red" onclick="PunchGame.restart()">
-            Restart 🔄
+            Restart from Level 1
           </button>
           <button class="btn btn-share" onclick="PunchGame.share('over')">
             📤 Share
