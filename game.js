@@ -465,7 +465,7 @@ const LEVELS = [
     emoji: "🎋",
     bg: "bamboo",
     speedMult: 1.05,
-    obsCount: 15,
+    obsCount: 11,
     music: "calm",
     desc: "Watch the hanging bamboo!",
   },
@@ -475,7 +475,7 @@ const LEVELS = [
     emoji: "🌊",
     bg: "river",
     speedMult: 1.12,
-    obsCount: 18,
+    obsCount: 12,
     music: "calm",
     desc: "Stay sharp out there.",
   },
@@ -485,7 +485,7 @@ const LEVELS = [
     emoji: "🏛️",
     bg: "ruins",
     speedMult: 1.2,
-    obsCount: 21,
+    obsCount: 13,
     music: "tense",
     desc: "The stones begin to fly...",
   },
@@ -495,7 +495,7 @@ const LEVELS = [
     emoji: "🍄",
     bg: "mushroom",
     speedMult: 1.3,
-    obsCount: 24,
+    obsCount: 14,
     music: "tense",
     desc: "Speed picks up. Focus.",
   },
@@ -506,7 +506,7 @@ const LEVELS = [
     emoji: "💎",
     bg: "cave",
     speedMult: 1.55,
-    obsCount: 27,
+    obsCount: 16,
     music: "dark",
     desc: "MUCH faster. Stay alive.",
   },
@@ -516,7 +516,7 @@ const LEVELS = [
     emoji: "🌋",
     bg: "volcano",
     speedMult: 1.82,
-    obsCount: 30,
+    obsCount: 17,
     music: "dark",
     desc: "The ground is on FIRE.",
   },
@@ -526,7 +526,7 @@ const LEVELS = [
     emoji: "🌙",
     bg: "moon",
     speedMult: 2.1,
-    obsCount: 33,
+    obsCount: 18,
     music: "dark",
     desc: "Almost there. Do NOT stop.",
   },
@@ -536,7 +536,7 @@ const LEVELS = [
     emoji: "⚡",
     bg: "storm",
     speedMult: 2.4,
-    obsCount: 36,
+    obsCount: 20,
     music: "intense",
     desc: "MAXIMUM SPEED. GO GO GO!",
   },
@@ -546,7 +546,7 @@ const LEVELS = [
     emoji: "🧸",
     bg: "final",
     speedMult: 2.75,
-    obsCount: 39,
+    obsCount: 22,
     music: "intense",
     desc: "THIS IS IT. FOR THE PLUSHIE!",
   },
@@ -745,48 +745,35 @@ const PunchGame = (() => {
     graceTimer = 0;
 
   const TSTEPS = [
-    {
-      icon: "❤️",
-      text: "You have 3 hearts. Lose them all = game over. Collect ❤️ gems for more!",
-      action: "auto",
-      delay: 3200,
-      pause: false,
-      spawn: null,
-    },
+    /* Step 0: jump — obstacle comes, game paused until player jumps */
     {
       icon: "⬆️",
-      text: "Obstacle incoming! Jump over it!",
+      text: "Jump over it!",
       dk: "SPACE / ↑ / W",
-      mk: "Tap ↑ button or swipe up",
+      mk: "Tap ↑  or  swipe up",
       action: "jump",
       pause: true,
       spawn: "jumper",
     },
+    /* Step 1: duck — vine comes, paused until player ducks */
     {
       icon: "⬇️",
-      text: "Duck under the vine — it WILL hit you if you stay standing!",
+      text: "Duck under the vine! Hold ↓ to stay low.",
       dk: "↓ / S  (hold)",
-      mk: "Swipe down  or  tap ↓",
+      mk: "Swipe down  or  hold ↓",
       action: "slide",
       pause: true,
       spawn: "vine",
     },
+    /* Step 2: double jump — bigbobo, paused until djump */
     {
       icon: "⬆️⬆️",
-      text: "Tall obstacle! Jump TWICE — press jump again while airborne!",
-      dk: "SPACE  then  SPACE again mid-air",
-      mk: "Tap ↑  then  tap ↑ again mid-air",
+      text: "Too tall! Jump TWICE — tap ↑ again mid-air!",
+      dk: "SPACE  →  SPACE",
+      mk: "Tap ↑  →  tap ↑ again",
       action: "djump",
       pause: true,
       spawn: "bigbobo",
-    },
-    {
-      icon: "💎",
-      text: "Collect gems for points & powers! Run through that gem!",
-      action: "gem",
-      pause: false,
-      spawn: "coin",
-      delay: 5500,
     },
   ];
 
@@ -798,7 +785,7 @@ const PunchGame = (() => {
     tutHideBar();
     tutHideArr();
     hitCooldown = 9999; /* fully invincible during tutorial */
-    setTimeout(() => tutNext(), 1600); /* let Punch walk freely first */
+    setTimeout(() => tutNext(), 600); /* short free walk then first obstacle */
   }
 
   function tutNext() {
@@ -808,7 +795,7 @@ const PunchGame = (() => {
       tutHideBar();
       tutHideArr();
       hitCooldown = 0; /* restore normal hitCooldown counting */
-      graceTimer = 10; /* 10 second grace period after tutorial — let the dog out slowly */
+      graceTimer = 6; /* 6 second grace period after tutorial */
       doCountdown();
       return;
     }
@@ -855,7 +842,7 @@ const PunchGame = (() => {
     tutPaused = false;
     tutHideBar();
     tutHideArr();
-    setTimeout(() => tutNext(), 1100);
+    setTimeout(() => tutNext(), 700);
   }
 
   function spawnTutOb(type) {
@@ -1361,11 +1348,14 @@ const PunchGame = (() => {
         .join("  ") || "none";
     document.getElementById("go-gems-info").textContent =
       `Gems: ${gemsCollected}/${gemsTotal} — ${gs}`;
-    const cc = lives > 0;
-    document.getElementById("cont-btn").style.display = cc ? "" : "none";
-    document.getElementById("continue-info").textContent = cc
-      ? `${lives} ❤️ left — continue Level ${level}`
-      : "No hearts left!";
+    /* Always allow retry at same level — never boot to level 1 */
+    document.getElementById("cont-btn").style.display = "block";
+    document.getElementById("cont-btn").textContent =
+      lives > 0 ? `Continue ❤️ (${lives} left)` : "Try Again 🔄";
+    document.getElementById("continue-info").textContent =
+      `Level ${level} — pick up right where you left off`;
+    showHUD(false);
+    showScr("scr-over");
     showHUD(false);
     showScr("scr-over");
   }
@@ -1385,17 +1375,16 @@ const PunchGame = (() => {
     setTimeout(() => renderWin(), 100);
   }
   function continueRun() {
-    if (lives <= 0) {
-      restart();
-      return;
-    }
+    /* Stay on same level, keep obsBeaten progress, just respawn Punch */
+    if (lives <= 0)
+      lives = 1; /* give 1 heart if totally out — Try Again is still fair */
     obstacles = [];
     collectibles = [];
     particles = [];
-    obsBeaten = 0;
     hitCooldown = 0;
-    obsCD = 1.3;
-    colCD = 0.9;
+    graceTimer = 3; /* 3s grace on respawn */
+    obsCD = 1.8;
+    colCD = 1.0; /* brief spawn pause so player isn't immediately swarmed */
     resetP();
     showHUD(true);
     showScr(null);
@@ -1403,8 +1392,10 @@ const PunchGame = (() => {
     const t = document.getElementById("level-toast");
     if (t) {
       document.getElementById("toast-lvl").textContent = "LEVEL " + level;
-      document.getElementById("toast-name").textContent = "💪 Continue!";
-      document.getElementById("toast-desc").textContent = "You got this!";
+      document.getElementById("toast-name").textContent =
+        "💪 Back on your feet!";
+      document.getElementById("toast-desc").textContent =
+        `${obsBeaten}/${obsNeeded} obstacles cleared`;
       t.style.display = "block";
     }
     setTimeout(() => {
@@ -1414,7 +1405,7 @@ const PunchGame = (() => {
       state = "playing";
       lastTS = performance.now();
       animId = requestAnimationFrame(loop);
-    }, 1300);
+    }, 1400);
   }
   function restart() {
     cleanUp();
@@ -1558,39 +1549,55 @@ const PunchGame = (() => {
       }
 
       /* ─── COLLISION ────────────────────
-         COMPLETELY SKIP collision during tutorial (hitCooldown=9999).
-         After tutorial ends a 10s grace period fades in (graceTimer).
-         Vine / swinger: leaf cluster at bottom, 30% of height.
-         Ground obs: 12% horizontal shrink for forgiveness.
+         Skip entirely during tutorial / grace period.
+         VINE / SWINGER: dual-zone —
+           • Rope column (narrow, full height) — jumping INTO rope = damage
+           • Leaf cluster (wide, bottom 18%) — standing under = damage
+         GROUND OBS: 12% horizontal shrink + Knuckles/Slippy use 72% height
+           so a clean jump over them (head skims top) never triggers damage.
       */
       if (hitCooldown <= 0 && graceTimer <= 0) {
         const hit = pHit();
-        let ox, ow2, oy, oh;
         if (o.villain.duck) {
-          /* Vine: leaf zone. ob.y IS the leaf bottom.
-             Danger zone: from ob.y-h*0.30 (top of leaves) to ob.y (leaf bottom). */
-          ox = o.x - o.w * 0.15;
-          ow2 = o.w * 1.3;
-          oy = o.y - o.h * 0.3;
-          oh = o.h * 0.3;
-          //oy=o.y-o.h*.18; oh=o.h*.18;
-
-          oy = o.y - o.h * 0.18;
-          oh = o.h * 0.18;
+          /* --- Vine / Swinger --- */
+          const ropeW = o.w * 0.5;
+          const ropeOx = o.x + o.w / 2 - ropeW / 2;
+          const leafOx = o.x - o.w * 0.15,
+            leafOw = o.w * 1.3;
+          const leafOy = o.y - o.h * 0.18,
+            leafOh = o.h * 0.18;
+          /* rope spans from screen top down to just above leaf cluster */
+          const ropeOy = 0,
+            ropeOh = Math.max(0, leafOy);
+          const inLeaf =
+            hit.x < leafOx + leafOw &&
+            hit.x + hit.w > leafOx &&
+            hit.y < leafOy + leafOh &&
+            hit.y + hit.h > leafOy;
+          const inRope =
+            hit.x < ropeOx + ropeW &&
+            hit.x + hit.w > ropeOx &&
+            hit.y < ropeOy + ropeOh &&
+            hit.y + hit.h > ropeOy;
+          if (inLeaf || inRope) takeDmg(o.villain);
         } else {
+          /* --- Ground obstacles --- */
           const mx = o.w * 0.12;
-          ox = o.x + mx;
-          ow2 = o.w - mx * 2;
-          oy = o.y - o.h;
-          oh = o.h;
-        }
-        if (
-          hit.x < ox + ow2 &&
-          hit.x + hit.w > ox &&
-          hit.y < oy + oh &&
-          hit.y + hit.h > oy
-        ) {
-          takeDmg(o.villain);
+          const ox = o.x + mx,
+            ow2 = o.w - mx * 2;
+          /* Knuckles (slider) and Slippy (peel) are short — only bottom 72% is lethal.
+             Jumping over cleanly won't ghost-damage even if pixel-perfect. */
+          const hf =
+            o.villain.id === "slider" || o.villain.id === "peel" ? 0.72 : 1.0;
+          const oy = o.y - o.h * hf,
+            oh = o.h * hf;
+          if (
+            hit.x < ox + ow2 &&
+            hit.x + hit.w > ox &&
+            hit.y < oy + oh &&
+            hit.y + hit.h > oy
+          )
+            takeDmg(o.villain);
         }
       }
       if (o.x < -o.w * 2) obstacles.splice(i, 1);
